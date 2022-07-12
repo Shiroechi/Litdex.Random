@@ -50,7 +50,7 @@ namespace Litdex.Random
 
 		#endregion Public Method
 
-		#region IRNG Method
+		#region Basic Method
 
 		/// <summary>
 		///	Generate <see cref="bool"/> value.
@@ -379,7 +379,7 @@ namespace Litdex.Random
 			return minValue + (this.NextDouble() % diff);
 		}
 
-		#endregion IRNG Method
+		#endregion Basic Method
 
 		private static void ThrowMinMaxValueSwapped()
 		{
