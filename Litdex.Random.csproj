@@ -1,0 +1,42 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;net6.0</TargetFrameworks>
+    <PackageProjectUrl>https://github.com/Shiroechi/Litdex.Random</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/Shiroechi/Litdex.Random</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <PackageTags>Random RNG PRNG GJrand JSF MSWS PCG Romu Seiran SFC Shioi Shishua Splitmix Squares Tyche Wyrand Xoroshiro Xoshiro</PackageTags>
+    <Version>1.0.0</Version>
+    <Authors>Shiroechi</Authors>
+    <Description>Library that provide many random generator algorithm.</Description>
+    <EnableNETAnalyzers>True</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <PackageReleaseNotes>* Add .Net Standard 2.0, 2.1 and .Net 5 upward version.
+* Remove interface (IRNG, IDistriution, ISequence).
+* Add signed 32bit and 64bit integer method, before only unsigned only.
+* Improve `NextUInt(uint, uint)` perfomance by change the algorithm.
+* Fix wrong Lemire implementation in `NextUInt64(ulong, ulong)`
+* Remove Gamma distribution.
+* Add new algorithm to generate Gaussian or normal distribution number.</PackageReleaseNotes>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <Company>Litdex</Company>
+    <Copyright>Shiroechi</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="LICENSE.txt" Pack="true" PackagePath="" />
+    <None Include="README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Litdex.Utilities\Litdex.Utilities.csproj" />
+  </ItemGroup>
+
+</Project>
