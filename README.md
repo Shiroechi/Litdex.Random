@@ -16,6 +16,7 @@ Litdex.Random have already provide some basic random algorithm, so you can use i
 
 ## Current Version
 
+[![Nuget](https://img.shields.io/nuget/v/Litdex.Random?label=Litdex.Random&style=for-the-badge)](https://www.nuget.org/packages/Litdex.Random)
 
 # This package contains:
 
