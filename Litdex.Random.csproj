@@ -13,7 +13,13 @@
     <Description>Library that provide many random generator algorithm.</Description>
     <EnableNETAnalyzers>True</EnableNETAnalyzers>
     <AnalysisLevel>latest</AnalysisLevel>
-    <PackageReleaseNotes>Litdex.Security.RNG</PackageReleaseNotes>
+    <PackageReleaseNotes>* Add .Net Standard 2.0, 2.1 and .Net 5 upward version.
+* Remove interface (IRNG, IDistriution, ISequence).
+* Add signed 32bit and 64bit integer method, before only unsigned only.
+* Improve `NextUInt(uint, uint)` perfomance by change the algorithm.
+* Fix wrong Lemire implementation in `NextUInt64(ulong, ulong)`
+* Remove Gamma distribution.
+* Add new algorithm to generate Gaussian or normal distribution number.</PackageReleaseNotes>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
     <Company>Litdex</Company>
