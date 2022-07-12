@@ -1,16 +1,21 @@
 # Litdex.Random
 
-Library that provide basic random generator function with extra feature.
+[Litdex.Random](https://github.com/Shiroechi/Litdex.Random) is continuation from [Litdex.Security.RNG](https://github.com/Shiroechi/Litdex.Security.RNG). Litdex.Random have different namespace and will become the focus of next development. Litdex.Security.RNG will still available but will not receive any bug fix or any update in the future.
 
-[Litdex.Random](https://github.com/Shiroechi/Litdex.Random) have already provide some basic random algorithm, so you can use it immediately rather than implement it yourself. But, still [Litdex.Random](https://github.com/Shiroechi/Litdex.Random) created with extensibility in mind, so you can implement your own *random generator* with this [library](https://github.com/Shiroechi/Litdex.Random).
+Litdex.Random provide basic random generator function with extra feature.
 
-[![CodeFactor](https://www.codefactor.io/repository/github/shiroechi/litdex.random/badge?style=for-the-badge)](https://www.codefactor.io/repository/github/shiroechi/litdex.random)
+Litdex.Random have already provide some basic random algorithm, so you can use it immediately rather than implement it yourself. But, still Litdex.Random created with extensibility in mind, so you can implement your own *random generator* with this library.
+
+[![CodeFactor](https://www.codefactor.io/repository/github/shiroechi/litdex.random/badge)](https://www.codefactor.io/repository/github/shiroechi/litdex.random)
 
 # Download
 
-[![Nuget](https://img.shields.io/nuget/v/litdex?label=Litdex&style=for-the-badge)](https://www.nuget.org/packages/Litdex/)
+## Previous version
 
 [![Nuget](https://img.shields.io/nuget/v/Litdex.Security.RNG?label=Litdex.Security.RNG&style=for-the-badge)](https://www.nuget.org/packages/Litdex.Security.RNG)
+
+## Current Version
+
 
 # This package contains:
 
@@ -162,18 +167,18 @@ WarmupCount=10
 
 # Warning
 
-For method that generate an arbitary byte array, like method `NextBytes` and `Fill`.
+For method that generate an arbitary byte array, using method `NextBytes` or `Fill`.
 
 ```C#
 var rng = new Xoroshiro128plus();
 var bytes = rng.NextBytes(10);
 ```
 
-Litdex generate the array using multiple `uint` or `ulong`, each `uint` or `ulong` will converted into byte array. When converted to byte array, Litdex order the byte based on Little Endian. Then each converted byte array will be concated with other byte array.
+Litdex.Random generate the array using multiple `uint` or `ulong`, each `uint` or `ulong` will converted into byte array. When converted to byte array, Litdex.Random order the byte based on Little Endian. Then each converted byte array will be concated with other byte array.
 
 # Contribute
 
-Feel free to open new [issue](https://github.com/Shiroechi/Litdex.Security.RNG/issues/new) or [PR](https://github.com/Shiroechi/Litdex.Security.RNG/pulls).
+Feel free to open new [issue](https://github.com/Shiroechi/Litdex.Random/issues) or [PR](https://github.com/Shiroechi/Litdex.Random/pulls).
 
 # Donation
 
