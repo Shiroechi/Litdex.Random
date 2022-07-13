@@ -17,7 +17,7 @@ namespace Litdex.Random
 		///	A 64-bit floating point number normal distribution.
 		/// </returns>
 		[Obsolete]
-		protected virtual double NextGaussian()
+		public virtual double NextGaussian()
 		{
 			// See Knuth, ACP, Section 3.4.1 Algorithm C.
 			if (this._HaveNextGaussian == true)
