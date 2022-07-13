@@ -86,100 +86,63 @@ namespace Litdex.Random
 		/// <summary>
 		///	Generate gamma distribution from 2 numbers.
 		/// </summary>
-		/// <param name="alpha">
-		///	Alpha uniform number.
+		/// <param name="shape">
+		///	The shape (k, α) of the Gamma distribution. Range: α ≥ 0.
 		/// </param>
-		/// <param name="beta">
-		///	Beta uniform number.
+		/// <param name="rate">
+		///	The rate or inverse scale (β) of the Gamma distribution. Range: β ≥ 0.
 		/// </param>
 		/// <returns>
 		///	Gamma distribution.
 		/// </returns>
-		protected virtual double NextGamma(double alpha, double beta)
+		public virtual double NextGamma(double shape, double rate)
 		{
-			if (alpha < 0.0)
+			if (shape < 0 || rate < 0)
 			{
-				throw new ArgumentOutOfRangeException(nameof(alpha), "Alpha must > 0.0");
+				throw new ArgumentOutOfRangeException("shape or rate", "The shape or rate can't lower than 0.");
 			}
 
-			if (beta < 0.0)
+			if (double.IsPositiveInfinity(rate))
 			{
-				throw new ArgumentOutOfRangeException(nameof(beta), "Beta must > 0.0");
+				return shape;
 			}
 
-			if (alpha > 1.0)
+			var a = shape;
+			var alphafix = 1.0;
+
+			// Fix when alpha is less than one.
+			if (shape < 1.0)
 			{
-				// Uses R.C.H. Cheng, "The generation of Gamma
-				// variables with non-integral shape parameters",
-				// Applied Statistics, (1977), 26, No. 1, p71-74
+				a = shape + 1.0;
+				alphafix = Math.Pow(this.NextDouble(), 1.0 / shape);
+			}
 
-				var ainv = Math.Sqrt(2.0 * alpha - 1.0);
-
-				var bbb = alpha - Math.Log(4.0);
-				var ccc = alpha + ainv;
-
-				while (true)
+			var d = a - (1.0 / 3.0);
+			var c = 1.0 / Math.Sqrt(9.0 * d);
+			while (true)
+			{
+				var x = this.NextGaussian();
+				var v = 1.0 + (c * x);
+				while (v <= 0.0)
 				{
-					var u1 = this.NextDouble();
+					x = this.NextGaussian();
+					v = 1.0 + (c * x);
+				}
 
-					if (!(0.0000001 < u1 && u1 < 0.9999999))
-					{
-						continue;
-					}
+				v = v * v * v;
+				var u = this.NextDouble();
+				x = x * x;
+				if (u < 1.0 - (0.0331 * x * x))
+				{
+					return alphafix * d * v / rate;
+				}
 
-					var u2 = 1.0 - this.NextDouble();
-					var v = Math.Log(u1 / (1.0 - u1)) / ainv;
-					var x = alpha * Math.Exp(v);
-					var z = u1 * u1 * u2;
-					var r = bbb + ccc * v - x;
-
-					if ((r + (1.0 + Math.Log(4.5)) - 4.5 * z >= 0.0) || (r >= Math.Log(z)))
-					{
-						return x * beta;
-					}
+				if (Math.Log(u) < (0.5 * x) + (d * (1.0 - v + Math.Log(v))))
+				{
+					return alphafix * d * v / rate;
 				}
 			}
-			else if (alpha == 1.0)
-			{
-				return -Math.Log(1.0 - this.NextDouble()) * beta;
-			}
-			else
-			{
-				// alpha is between 0 and 1 (exclusive)
-				// Uses ALGORITHM GS of Statistical Computing - Kennedy & Gentle
-				double x;
 
-				while (true)
-				{
-					var u = this.NextDouble();
-					var b = (Math.E + alpha) / Math.E;
-					var p = b * u;
-
-					if (p < 1.0)
-					{
-						x = Math.Pow(p, (1.0 / alpha));
-					}
-					else
-					{
-						x = -Math.Log((b - p) / alpha);
-					}
-
-					var u1 = this.NextDouble();
-
-					if (p > 1.0)
-					{
-						if (u1 <= Math.Pow(x, (alpha - 1.0)))
-						{
-							break;
-						}
-					}
-					else if (u1 <= Math.Exp(-x))
-					{
-						break;
-					}
-				}
-				return x * beta;
-			}
 		}
 	}
 }
