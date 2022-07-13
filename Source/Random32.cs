@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Litdex.Random
 {
@@ -29,6 +30,7 @@ namespace Litdex.Random
 		/// <returns>
 		///	A 32-bit unsigned integer.
 		///	</returns>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		protected abstract uint Next();
 
 		#endregion Protected Method
