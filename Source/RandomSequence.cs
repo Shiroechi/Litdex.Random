@@ -8,6 +8,8 @@ namespace Litdex.Random
 {
 	public abstract partial class Random
 	{
+		#region Choice
+
 		/// <summary>
 		/// Select one element randomly from the given set.
 		/// </summary>
@@ -357,6 +359,10 @@ namespace Litdex.Random
 			return reservoir;
 		}
 
+		#endregion Choice
+
+		#region Sample
+
 		/// <summary>
 		///	Select arbitrary distinct element randomly.
 		/// </summary>
@@ -561,6 +567,10 @@ namespace Litdex.Random
 				return this.Sample(items, select);
 			}, cancellationToken);
 		}
+
+		#endregion Sample
+
+		#region Shuffle
 
 		/// <summary>
 		///	Shuffle items with Fisher-Yates shuffle then return the shuffled item in new array.
@@ -883,6 +893,8 @@ namespace Litdex.Random
 				this.ShuffleInPlace(items);
 			}, cancellationToken);
 		}
+
+		#endregion Shuffle
 
 		private static void ThrowNullArray()
 		{
