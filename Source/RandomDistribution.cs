@@ -144,5 +144,21 @@ namespace Litdex.Random
 			}
 
 		}
+
+		/// <summary>
+		/// Generates laplace distribution.
+		/// </summary>
+		/// <param name="mean">
+		///	The mean (μ) of the distribution.
+		/// </param>
+		/// <param name="scale">
+		/// The scale (b) of the distribution. Range: b > 0.
+		/// </param>
+		/// <returns></returns>
+		public virtual double NextLaplace(double mean, double scale)
+		{
+			var u = this.NextDouble() - 0.5;
+			return mean - (scale * Math.Sign(u) * Math.Log(1.0 - (2.0 * Math.Abs(u))));
+		}
 	}
 }
