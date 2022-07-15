@@ -22,7 +22,9 @@ namespace Litdex.Random
 		/// <returns>
 		///	A 64-bit floating point number beta distribution.
 		/// </returns>
-		/// <exception cref="ArgumentOutOfRangeException"></exception>
+		/// <exception cref="ArgumentOutOfRangeException">
+		/// Alpha or Beta", "Alpha or beta can't be negative or lower than 0.
+		/// </exception>
 		public virtual double BetaDistribution(double alpha, double beta)
 		{ 
 			if (alpha < 0.0 || beta < 0.0)
@@ -47,6 +49,33 @@ namespace Litdex.Random
 			}
 
 			return x / (x + y);
+		}
+
+		/// <summary>
+		/// Generate chi square distribution.
+		/// </summary>
+		/// <param name="k">
+		/// The degrees of freedom (k) of the distribution. Range: k > 0.
+		/// </param>
+		/// <returns>
+		/// A 64-bit floating point number chi square distribution.
+		/// </returns>
+		public virtual double ChiSquareDistribution(double k)
+		{
+			// Use the simple method if the degrees of freedom is an integer anyway
+			if (Math.Floor(k) == k && k < int.MaxValue)
+			{
+				double sum = 0;
+				var n = (int)k;
+				for (var i = 0; i < n; i++)
+				{
+					sum += Math.Pow(this.GaussianDistribution(0.0, 1.0), 2);
+				}
+
+				return sum;
+			}
+
+			return this.GammaDistribution(k / 2.0, 0.5);
 		}
 
 		/// <summary>
