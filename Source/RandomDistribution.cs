@@ -230,5 +230,35 @@ namespace Litdex.Random
 			var u = this.NextDouble() - 0.5;
 			return mean - (scale * Math.Sign(u) * Math.Log(1.0 - (2.0 * Math.Abs(u))));
 		}
+
+		/// <summary>
+		/// Generate triangular distribution.
+		/// </summary>
+		/// <param name="lower">
+		/// Lower bound. Range: lower ≤ mode ≤ upper.
+		/// </param>
+		/// <param name="upper">
+		/// Upper bound. Range: lower ≤ mode ≤ upper.
+		/// </param>
+		/// <param name="mode">
+		/// Mode (most frequent value). Range: lower ≤ mode ≤ upper.
+		/// </param>
+		/// <exception cref="ArgumentException">
+		/// If the upper bound is smaller than the mode or if the mode is smaller than the lower bound.</exception>
+		/// <returns>
+		/// A 64-bit floating point number laplace distribution.
+		/// </returns>
+		public virtual double TriangularDistribution(double lower, double upper, double mode)
+		{
+			var u = this.NextDouble();
+			if (u < (mode - lower) / (upper - lower))
+			{
+				return lower + Math.Sqrt(u * (upper - lower) * (mode - lower));
+			}
+			else
+			{
+				return upper - Math.Sqrt((1 - u) * (upper - lower) * (upper - mode));
+			}
+		}
 	}
 }
