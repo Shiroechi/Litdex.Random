@@ -11,6 +11,45 @@ namespace Litdex.Random
 		protected bool _HaveNextGaussian = false;
 
 		/// <summary>
+		/// Generate beta distribution.
+		/// </summary>
+		/// <param name="alpha">
+		/// The α shape parameter of the Beta distribution. Range: α ≥ 0.
+		/// </param>
+		/// <param name="beta">
+		/// The β shape parameter of the Beta distribution. Range: β ≥ 0.
+		/// </param>
+		/// <returns>
+		///	A 64-bit floating point number beta distribution.
+		/// </returns>
+		/// <exception cref="ArgumentOutOfRangeException"></exception>
+		public virtual double BetaDistribution(double alpha, double beta)
+		{ 
+			if (alpha < 0.0 || beta < 0.0)
+			{
+				throw new ArgumentOutOfRangeException("Alpha or Beta", "Alpha or beta can't be negative or lower than 0.");
+			}
+
+			double x, y;
+
+			if (alpha == beta)
+			{
+				x = this.NextGaussian(alpha, 1);
+				y = this.NextGaussian(beta, 1);
+			}
+			else
+			{
+				do
+				{
+					x = this.NextGaussian(alpha, 1);
+					y = this.NextGaussian(beta, 1);
+				} while (x == 0 && y == 0);
+			}
+
+			return x / (x + y);
+		}
+
+		/// <summary>
 		///	Generate gaussian distribution.
 		/// </summary>
 		/// <returns>
