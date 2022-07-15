@@ -132,7 +132,7 @@ namespace Litdex.Random
 		///	The rate or inverse scale (β) of the Gamma distribution. Range: β ≥ 0.
 		/// </param>
 		/// <returns>
-		///	Gamma distribution.
+		///	A 64-bit floating point number gamma distribution.
 		/// </returns>
 		public virtual double NextGamma(double shape, double rate)
 		{
@@ -185,7 +185,7 @@ namespace Litdex.Random
 		}
 
 		/// <summary>
-		/// Generates laplace distribution.
+		/// Generate laplace distribution.
 		/// </summary>
 		/// <param name="mean">
 		///	The mean (μ) of the distribution.
@@ -193,7 +193,9 @@ namespace Litdex.Random
 		/// <param name="scale">
 		/// The scale (b) of the distribution. Range: b > 0.
 		/// </param>
-		/// <returns></returns>
+		/// <returns>
+		/// A 64-bit floating point number laplace distribution.
+		/// </returns>
 		public virtual double NextLaplace(double mean, double scale)
 		{
 			var u = this.NextDouble() - 0.5;
