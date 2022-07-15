@@ -34,15 +34,15 @@ namespace Litdex.Random
 
 			if (alpha == beta)
 			{
-				x = this.NextGaussian(alpha, 1);
-				y = this.NextGaussian(beta, 1);
+				x = this.GaussianDistribution(alpha, 1);
+				y = this.GaussianDistribution(beta, 1);
 			}
 			else
 			{
 				do
 				{
-					x = this.NextGaussian(alpha, 1);
-					y = this.NextGaussian(beta, 1);
+					x = this.GaussianDistribution(alpha, 1);
+					y = this.GaussianDistribution(beta, 1);
 				} while (x == 0 && y == 0);
 			}
 
@@ -55,7 +55,7 @@ namespace Litdex.Random
 		/// <returns>
 		///	A 64-bit floating point number normal distribution.
 		/// </returns>
-		public virtual double NextGaussian()
+		public virtual double GaussianDistribution()
 		{
 			// See Knuth, ACP, Section 3.4.1 Algorithm C.
 			if (this._HaveNextGaussian == true)
@@ -95,7 +95,7 @@ namespace Litdex.Random
 		/// <returns>
 		///	A 64-bit floating point number normal distribution.
 		/// </returns>
-		public virtual double NextGaussian(double mean = 0, double stdDev = 1)
+		public virtual double GaussianDistribution(double mean = 0, double stdDev = 1)
 		{
 			if (this._HaveNextGaussian == true)
 			{
@@ -134,7 +134,7 @@ namespace Litdex.Random
 		/// <returns>
 		///	A 64-bit floating point number gamma distribution.
 		/// </returns>
-		public virtual double NextGamma(double shape, double rate)
+		public virtual double GammaDistribution(double shape, double rate)
 		{
 			if (shape < 0 || rate < 0)
 			{
@@ -160,11 +160,11 @@ namespace Litdex.Random
 			var c = 1.0 / Math.Sqrt(9.0 * d);
 			while (true)
 			{
-				var x = this.NextGaussian();
+				var x = this.GaussianDistribution();
 				var v = 1.0 + (c * x);
 				while (v <= 0.0)
 				{
-					x = this.NextGaussian();
+					x = this.GaussianDistribution();
 					v = 1.0 + (c * x);
 				}
 
@@ -196,7 +196,7 @@ namespace Litdex.Random
 		/// <returns>
 		/// A 64-bit floating point number laplace distribution.
 		/// </returns>
-		public virtual double NextLaplace(double mean, double scale)
+		public virtual double LaplaceDistribution(double mean, double scale)
 		{
 			var u = this.NextDouble() - 0.5;
 			return mean - (scale * Math.Sign(u) * Math.Log(1.0 - (2.0 * Math.Abs(u))));
