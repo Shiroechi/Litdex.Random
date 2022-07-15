@@ -11,7 +11,7 @@ namespace Litdex.Random.PRNG
 	/// </summary>
 	/// <remarks>
 	///	Still in experimental. Use with your own risk.
-	///		<para>https://github.com/espadrine/shishua</para>
+	///	<para>https://github.com/espadrine/shishua</para>
 	/// </remarks>
 	public class Shishua : Random64
 	{
