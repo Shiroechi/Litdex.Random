@@ -95,11 +95,6 @@ namespace Litdex.Random.PRNG
 			using (var rng = RandomNumberGenerator.Create())
 			{
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-			
-#else
-
-#endif
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 				Span<byte> span = new byte[32];
 				rng.GetNonZeroBytes(span);
 				this.SetSeed(
