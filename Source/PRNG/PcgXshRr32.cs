@@ -38,8 +38,7 @@ namespace Litdex.Random.PRNG
 		///	</param>
 		public PcgXshRr32(ulong seed = 0, ulong increment = 0)
 		{
-			// 2 for seed, 2 for increment 
-			this._State = new uint[4];
+			this._State = new uint[1]; // not used, but initilized
 			this.SetSeed(seed, increment);
 		}
 
