@@ -1,4 +1,7 @@
-﻿using System;
+﻿#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+using System.Buffers.Binary;
+# endif
+using System;
 using System.Security.Cryptography;
 
 namespace Litdex.Random.PRNG
@@ -74,8 +77,8 @@ namespace Litdex.Random.PRNG
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 				Span<byte> span = new byte[16];
 				rng.GetNonZeroBytes(span);
-				this._Sequence = System.Buffers.Binary.BinaryPrimitives.ReadUInt64LittleEndian(span);
-				this._Output = System.Buffers.Binary.BinaryPrimitives.ReadUInt64LittleEndian(span.Slice(8));
+				this._Sequence = BinaryPrimitives.ReadUInt64LittleEndian(span);
+				this._Output = BinaryPrimitives.ReadUInt64LittleEndian(span.Slice(8));
 #else
 				var bytes = new byte[16];
 				rng.GetNonZeroBytes(bytes);
