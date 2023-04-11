@@ -1,5 +1,10 @@
-﻿using System;
+﻿#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+using System.Buffers.Binary;
+# endif
+using System;
+using System.Security.Cryptography;
 
+using Litdex.Utilities;
 using Litdex.Utilities.Extension;
 
 namespace Litdex.Random.PRNG
@@ -11,9 +16,9 @@ namespace Litdex.Random.PRNG
 	/// <remarks>
 	///	Source: https://www.romu-random.org/
 	/// </remarks>
-	public class RomuDuoJr : RomuDuo
+	public class RomuDuoJr : Random64
 	{
-		#region Constructor & Destructor
+#region Constructor & Destructor
 
 		/// <summary>
 		///	Create an instance of <see cref="RomuDuoJr"/> object.
@@ -50,9 +55,9 @@ namespace Litdex.Random.PRNG
 			Array.Clear(this._State, 0, this._State.Length);
 		}
 
-		#endregion Constructor & Destructor
+#endregion Constructor & Destructor
 
-		#region Protected Method
+#region Protected Method
 
 		/// <inheritdoc/>
 		protected override ulong Next()
@@ -64,9 +69,9 @@ namespace Litdex.Random.PRNG
 			return xp;
 		}
 
-		#endregion Protected Method
+#endregion Protected Method
 
-		#region Public Method
+#region Public Method
 
 		/// <inheritdoc/>
 		public override string AlgorithmName()
@@ -74,6 +79,42 @@ namespace Litdex.Random.PRNG
 			return "Romu Duo Jr 64-bit";
 		}
 
-		#endregion Public Method
+		/// <inheritdoc/>
+		public override void Reseed()
+		{
+			using (var rng = RandomNumberGenerator.Create())
+			{
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+				Span<byte> span = new byte[16];
+				rng.GetNonZeroBytes(span);
+				this.SetSeed(
+					seed1: BinaryPrimitives.ReadUInt64LittleEndian(span),
+					seed2: BinaryPrimitives.ReadUInt64LittleEndian(span.Slice(8)));
+#else
+				var bytes = new byte[16];
+				rng.GetNonZeroBytes(bytes);
+				this.SetSeed(
+					seed1: BinaryConverter.ToUInt64(bytes, 0),
+					seed2: BinaryConverter.ToUInt64(bytes, 8));
+#endif
+			}
+		}
+
+		/// <summary>
+		///	Set RNG seed manually.
+		/// </summary>
+		/// <param name="seed1">
+		///	First RNG seed.
+		/// </param>
+		/// <param name="seed2">
+		///	Second RNG seed.
+		/// </param>
+		public void SetSeed(ulong seed1, ulong seed2)
+		{
+			this._State[0] = seed1;
+			this._State[1] = seed2;
+		}
+
+#endregion Public Method
 	}
 }

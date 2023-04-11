@@ -1,8 +1,9 @@
 ﻿#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 using System.Buffers.Binary;
 #endif
-using System;
 using System.Security.Cryptography;
+
+using Litdex.Utilities;
 
 namespace Litdex.Random.PRNG
 {
@@ -104,7 +105,7 @@ namespace Litdex.Random.PRNG
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 				this.SetSeed(seed: BinaryPrimitives.ReadUInt64LittleEndian(bytes));
 #else
-				this.SetSeed(seed: BitConverter.ToUInt64(bytes, 0));
+				this.SetSeed(seed: BinaryConverter.ToUInt64(bytes, 0));
 #endif
 			}
 		}

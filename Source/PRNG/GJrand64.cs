@@ -5,6 +5,7 @@ using System;
 using System.Security.Cryptography;
 
 using Litdex.Utilities.Extension;
+using Litdex.Utilities;
 
 namespace Litdex.Random.PRNG
 {
@@ -106,10 +107,10 @@ namespace Litdex.Random.PRNG
 				var bytes = new byte[32];
 				rng.GetNonZeroBytes(bytes);
 				this.SetSeed(
-					seed1: BitConverter.ToUInt64(bytes, 0),
-					seed2: BitConverter.ToUInt64(bytes, 8),
-					seed3: BitConverter.ToUInt64(bytes, 16),
-					seed4: BitConverter.ToUInt64(bytes, 24));
+					seed1: BinaryConverter.ToUInt64(bytes, 0),
+					seed2: BinaryConverter.ToUInt64(bytes, 8),
+					seed3: BinaryConverter.ToUInt64(bytes, 16),
+					seed4: BinaryConverter.ToUInt64(bytes, 24));
 #endif
 			}
 		}
@@ -124,7 +125,7 @@ namespace Litdex.Random.PRNG
 			this._State[2] = seed3;
 			this._State[3] = seed4;
 
-			for (var i = 0; i < _InitialRoll; i++)
+			for (var i = 0; i < RandomUtil.InitialRoll; i++)
 			{
 				this.Advance();
 			}

@@ -1,20 +1,16 @@
 ﻿#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 using System.Buffers.Binary;
 #endif
-using System;
 using System.Security.Cryptography;
+using System;
+using Litdex.Utilities.Extension;
 
 namespace Litdex.Random.PRNG
 {
 	/// <summary>
-	///	A Permuted Congruential Generator (PCG) that is composed of a 64-bit 
-	///	Linear Congruential Generator(LCG) combined with the RXS-M-XS (random xorshift; multiply; xorshift) output
-	///	transformation to create 64-bit output.
+	/// 
 	/// </summary>
-	/// <remarks>
-	///	Source: https://www.pcg-random.org/
-	/// </remarks>
-	public class PcgRxsMXs64 : Random64
+	public class PcgXslRrRr64 : Random64
 	{
 		#region Member
 
@@ -25,42 +21,21 @@ namespace Litdex.Random.PRNG
 
 		#endregion Member
 
-		#region Constructor & Destructor
-
-		/// <summary>
-		///	Create an instance of <see cref="PcgRxsMXs64"/> object.
-		/// </summary>
-		/// <param name="seed">
-		///	RNG seed.
-		///	</param>
-		/// <param name="increment">
-		///	Increment step.
-		///	</param>
-		public PcgRxsMXs64(ulong seed = 0, ulong increment = 0)
-		{
-			this._State = new ulong[2];
-			this.SetSeed(seed, increment);
-		}
-
-		/// <summary>
-		///	Destructor.
-		/// </summary>
-		~PcgRxsMXs64()
-		{
-			Array.Clear(this._State, 0, this._State.Length);
-		}
-
-		#endregion Constructor & Destructor
-
 		#region Protected Method
 
 		/// <inheritdoc/>
 		protected override ulong Next()
 		{
 			var oldState = this._State[0];
-			this._State[0] = (oldState * _PCG_Multiplier_64) + (this._State[1] | 1);
-			ulong word = ((oldState >> ((int)(oldState >> 59) + 5)) ^ oldState) * 12605985483714917081;
-			return (word >> 43) ^ word;
+			this._State[0] = this._State[0] * _PCG_Multiplier_64 + this._State[1];
+
+			var rot1 = (int)(oldState >> 59);
+			var high = (uint)(oldState >> 32);
+			var low = (uint)oldState;
+			var xored = high ^ low;
+			var newlow = xored.RotateRight(rot1);
+			var newhigh = high.RotateRight((int)(newlow & 31));
+			return (((ulong)newhigh) << 32) | newlow;
 		}
 
 		#endregion Protected Method
@@ -70,7 +45,7 @@ namespace Litdex.Random.PRNG
 		/// <inheritdoc/>
 		public override string AlgorithmName()
 		{
-			return "PCG RXS-M-XS 64-bit";
+			return "PCG XSL-RR-RR 64-bit";
 		}
 
 		/// <inheritdoc/>

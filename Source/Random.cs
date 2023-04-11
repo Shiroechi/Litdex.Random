@@ -1,7 +1,6 @@
 ﻿#if NET5_0_OR_GREATER
 using System.Numerics;
 #endif
-
 using System;
 using System.Runtime.CompilerServices;
 
@@ -13,16 +12,134 @@ namespace Litdex.Random
 	///	Represents a pseudo-random number generator, which is an algorithm that produces a sequence of numbers
 	/// that meet certain statistical requirements for randomness.
 	/// </summary>
-	public abstract partial class Random
+	public partial class Random
 	{
 		#region Member
 
-		/// <summary>
-		///	Amount of roll after the state is initialized or seeded.
-		/// </summary>
-		protected const byte _InitialRoll = 20;
+		private IRandomEngine _Engine;
 
 		#endregion Member
+
+		#region Constructor & Destructor
+
+		/// <summary>
+		/// Create a new instance of the <see cref="Litdex.Random.Random"/> class.
+		/// </summary>
+		/// <param name="engine">
+		/// Random algorithm to utilizes.
+		/// </param>
+		/// <exception cref="ArgumentNullException">
+		/// Engine can't be null.
+		/// </exception>
+		public Random(IRandomEngine engine)
+		{
+			if (engine == null)
+			{
+				throw new ArgumentNullException("Engine can't be null.");
+			}
+
+			this._Engine = engine;
+		}
+
+		~Random()
+		{
+			this._Engine = null;
+		}
+
+		#endregion Constructor & Destructor
+
+		#region Private Method
+
+		private static void ThrowMinMaxValueSwapped()
+		{
+			throw new ArgumentOutOfRangeException("minValue", "minValue is greater than maxValue");
+		}
+
+		private static void ThrowMinMaxValueNegative()
+		{
+			throw new ArgumentException("minValue or maxValue is negative.");
+		}
+
+		/// <summary>
+		///	Returns the integer (ceiling) log of the specified value, base 2.
+		/// </summary>
+		/// <param name="value">
+		///	The value to ceil.
+		///	</param>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static int Log2Ceiling(ulong value)
+		{
+#if NET5_0_OR_GREATER
+			int result = BitOperations.Log2(value);
+			if (BitOperations.PopCount(value) != 1)
+			{
+				result++;
+			}
+			return result;
+#else
+			int result = (int)Math.Log(value, 2);
+			if (PopCount(value) != 1)
+			{
+				result++;
+			}
+			return result;
+#endif
+		}
+
+		/// <summary>
+		///	Returns the population count (number of bits set) of a mask.
+		///	Similar in behavior to the x86 instruction POPCNT.
+		/// </summary>
+		/// <param name="value">
+		///	The value.
+		///	</param>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		internal static int PopCount(ulong value)
+		{
+			const ulong c1 = 0x_55555555_55555555ul;
+			const ulong c2 = 0x_33333333_33333333ul;
+			const ulong c3 = 0x_0F0F0F0F_0F0F0F0Ful;
+			const ulong c4 = 0x_01010101_01010101ul;
+
+			value -= (value >> 1) & c1;
+			value = (value & c2) + ((value >> 2) & c2);
+			value = (((value + (value >> 4)) & c3) * c4) >> 56;
+
+			return (int)value;
+		}
+
+		/// <summary>
+		/// Convert 2 unsigned 32-bit integer into unsigned 64-bit integer.
+		/// </summary>
+		/// <param name="high">
+		///	The high bit order of unsigned 64-bit integer.
+		/// </param>
+		/// <param name="low">
+		/// The high bit order of unsigned 64-bit integer.
+		/// </param>
+		/// <returns>
+		/// Converted unsigned 64-bit integer.
+		/// </returns>
+		internal static ulong ToUint64(uint high, uint low)
+		{
+			return (((ulong)high) << 32) | low;
+		}
+
+		/// <summary>
+		/// Convert unsigned 64-bit integer into 2 unsigned 32-bit integer.
+		/// </summary>
+		/// <param name="number">
+		///	Unsigned 64-bit integer to convert.
+		/// </param>
+		/// <returns></returns>
+		internal static (uint, uint) ToUint(ulong number)
+		{
+			uint high = (uint)(number >> 32);
+			uint low = (uint)number;
+			return (high, low);
+		}
+
+		#endregion Private Method
 
 		#region Public Method
 
@@ -34,18 +151,41 @@ namespace Litdex.Random
 		/// </returns>
 		public virtual string AlgorithmName()
 		{
-			return "Random";
+			return this._Engine.AlgorithmName();
 		}
 
 		/// <summary>
 		///	Seed with <see cref="System.Security.Cryptography.RandomNumberGenerator"/>.
 		///	</summary>
-		public abstract void Reseed();
+		public virtual void Reseed()
+		{
+			this._Engine.Reseed();
+		}
 
 		/// <inheritdoc/>
 		public override string ToString()
 		{
 			return this.AlgorithmName();
+		}
+
+		/// <summary>
+		/// Gets and sets <see cref="Random"/> engine algorithm.
+		/// </summary>
+		public IRandomEngine Engine
+		{
+			get
+			{
+				return this._Engine;
+			}
+			set
+			{
+				if (value == null)
+				{
+					throw new ArgumentNullException("Engine can't be null.");
+				}
+
+				this._Engine = value;
+			}
 		}
 
 		#endregion Public Method
@@ -58,7 +198,10 @@ namespace Litdex.Random
 		/// <returns>
 		///	<see langword="true"/> or <see langword="false"/>.
 		/// </returns>
-		public abstract bool NextBoolean();
+		public virtual bool NextBoolean()
+		{
+			return this._Engine.NextBoolean();
+		}
 
 		/// <summary>
 		///	Generate a non-negative random integer.
@@ -66,7 +209,10 @@ namespace Litdex.Random
 		/// <returns>
 		///	A 8-bit unsigned integer that is greater than or equal to 0.
 		/// </returns>
-		public abstract byte NextByte();
+		public virtual byte NextByte()
+		{
+			return this._Engine.NextByte();
+		}
 
 		/// <summary>
 		///	Generate <see cref="byte"/> that is within a specified range.
@@ -110,7 +256,10 @@ namespace Litdex.Random
 		/// <exception cref="ArgumentOutOfRangeException">
 		///	The requested output size can't lower than 1.
 		/// </exception>
-		public abstract byte[] NextBytes(int length);
+		public virtual byte[] NextBytes(int length)
+		{
+			return this._Engine.NextBytes(length);
+		}
 
 		/// <summary>
 		///	Fills the elements of a specified array of bytes with random numbers.
@@ -121,7 +270,10 @@ namespace Litdex.Random
 		/// <exception cref="ArgumentNullException">
 		///	Array length can't be lower than 1 or null.
 		/// </exception>
-		public abstract void Fill(byte[] buffer);
+		public virtual void Fill(byte[] buffer)
+		{
+			this._Engine.Fill(buffer);
+		}
 
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 
@@ -134,7 +286,10 @@ namespace Litdex.Random
 		/// <exception cref="ArgumentNullException">
 		///	Array length can't be lower than 1 or null.
 		/// </exception>
-		public abstract void Fill(Span<byte> buffer);
+		public virtual void Fill(Span<byte> buffer)
+		{
+			this._Engine.Fill(buffer);
+		}
 
 #endif
 
@@ -144,7 +299,10 @@ namespace Litdex.Random
 		/// <returns>
 		///	A 32-bit signed integer.
 		/// </returns>
-		public abstract int NextInt();
+		public virtual int NextInt()
+		{
+			return this._Engine.NextInt();
+		}
 
 		/// <summary>
 		///	Generate <see cref="int"/> that is within a specified range.
@@ -179,7 +337,7 @@ namespace Litdex.Random
 				return (int)result;
 			}
 
-			return (int)(result >> 1);
+			return (int)result;
 		}
 
 		/// <summary>
@@ -188,7 +346,10 @@ namespace Litdex.Random
 		/// <returns>
 		///	A 32-bit unsigned integer.
 		/// </returns>
-		public abstract uint NextUInt();
+		public virtual uint NextUInt()
+		{
+			return this._Engine.NextUInt();
+		}
 
 		/// <summary>
 		///	Generate <see cref="uint"/> that is within a specified range.
@@ -242,7 +403,10 @@ namespace Litdex.Random
 		/// <returns>
 		///	A 64-bit signed integer.
 		/// </returns>
-		public abstract long NextInt64();
+		public virtual long NextInt64()
+		{
+			return this._Engine.NextInt64();
+		}
 
 		/// <summary>
 		///	Generate <see cref="long"/> that is within a specified range.
@@ -277,7 +441,7 @@ namespace Litdex.Random
 				return (long)result;
 			}
 
-			return (long)(result >> 1);
+			return (long)result;
 		}
 
 		/// <summary>
@@ -286,7 +450,10 @@ namespace Litdex.Random
 		/// <returns>
 		///	A 64-bit unsigned integer.
 		/// </returns>
-		public abstract ulong NextUInt64();
+		public virtual ulong NextUInt64()
+		{
+			return this._Engine.NextUInt64();
+		}
 
 		/// <summary>
 		///	Generate <see cref="ulong"/> that is within a specified range.
@@ -380,63 +547,5 @@ namespace Litdex.Random
 		}
 
 		#endregion Basic Method
-
-		private static void ThrowMinMaxValueSwapped()
-		{
-			throw new ArgumentOutOfRangeException("minValue", "minValue is greater than maxValue");
-		}
-
-		private static void ThrowMinMaxValueNegative()
-		{
-			throw new ArgumentException("minValue or maxValue is negative.");
-		}
-
-		/// <summary>
-		///	Returns the integer (ceiling) log of the specified value, base 2.
-		/// </summary>
-		/// <param name="value">
-		///	The value to ceil.
-		///	</param>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static int Log2Ceiling(ulong value)
-		{
-#if NET5_0_OR_GREATER
-			int result = BitOperations.Log2(value);
-			if (BitOperations.PopCount(value) != 1)
-			{
-				result++;
-			}
-			return result;
-#else
-			int result = (int)Math.Log(value, 2);
-			if (PopCount(value) != 1)
-			{
-				result++;
-			}
-			return result;
-#endif
-		}
-
-		/// <summary>
-		///	Returns the population count (number of bits set) of a mask.
-		///	Similar in behavior to the x86 instruction POPCNT.
-		/// </summary>
-		/// <param name="value">
-		///	The value.
-		///	</param>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		internal static int PopCount(ulong value)
-		{
-			const ulong c1 = 0x_55555555_55555555ul;
-			const ulong c2 = 0x_33333333_33333333ul;
-			const ulong c3 = 0x_0F0F0F0F_0F0F0F0Ful;
-			const ulong c4 = 0x_01010101_01010101ul;
-
-			value -= (value >> 1) & c1;
-			value = (value & c2) + ((value >> 2) & c2);
-			value = (((value + (value >> 4)) & c3) * c4) >> 56;
-
-			return (int)value;
-		}
 	}
 }

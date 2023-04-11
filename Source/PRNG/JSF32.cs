@@ -1,9 +1,10 @@
 ﻿#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 using System.Buffers.Binary;
-# endif
+#endif
 using System;
 using System.Security.Cryptography;
 
+using Litdex.Utilities;
 using Litdex.Utilities.Extension;
 
 namespace Litdex.Random.PRNG
@@ -75,7 +76,7 @@ namespace Litdex.Random.PRNG
 #else
 				var bytes = new byte[4];
 				rng.GetNonZeroBytes(bytes);
-				this.SetSeed(BitConverter.ToUInt32(bytes, 0));
+				this.SetSeed(BinaryConverter.ToUInt32(bytes, 0));
 #endif
 			}
 		}
@@ -91,7 +92,7 @@ namespace Litdex.Random.PRNG
 			this._State[0] = 0xF1EA5EED;
 			this._State[1] = this._State[2] = this._State[3] = seed;
 
-			for (var i = 0; i < _InitialRoll; i++)
+			for (var i = 0; i < RandomUtil.InitialRoll; i++)
 			{
 				this.Next();
 			}

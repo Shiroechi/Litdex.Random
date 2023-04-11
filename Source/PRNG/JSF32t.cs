@@ -17,9 +17,9 @@ namespace Litdex.Random.PRNG
 		/// <param name="seed">
 		///	RNG seed.
 		///	</param>
-		public JSF32t(uint seed = 0)
+		public JSF32t(uint seed = 0) : base(seed)
 		{
-			this.SetSeed(seed);
+
 		}
 
 		/// <summary>

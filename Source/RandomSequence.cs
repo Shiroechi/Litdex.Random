@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Litdex.Random
 {
-	public abstract partial class Random
+	public partial class Random
 	{
 		#region Choice
 

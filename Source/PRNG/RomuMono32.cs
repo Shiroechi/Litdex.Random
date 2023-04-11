@@ -4,6 +4,7 @@ using System.Buffers.Binary;
 using System;
 using System.Security.Cryptography;
 
+using Litdex.Utilities;
 using Litdex.Utilities.Extension;
 
 namespace Litdex.Random.PRNG
@@ -68,11 +69,11 @@ namespace Litdex.Random.PRNG
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 				var bytes = new byte[4];
 				rng.GetBytes(bytes);
-				this.SetSeed(BinaryPrimitives.ReadUInt32LittleEndian(bytes));			
+				this.SetSeed(BinaryPrimitives.ReadUInt32LittleEndian(bytes));
 #else
 				var bytes = new byte[4];
 				rng.GetBytes(bytes);
-				this.SetSeed(BitConverter.ToUInt32(bytes, 0));
+				this.SetSeed(BinaryConverter.ToUInt32(bytes, 0));
 #endif
 			}
 		}

@@ -6,7 +6,7 @@ namespace Litdex.Random
 	/// <summary>
 	///	Base class for Random Number Generator that the internal state produces 32-bit output.
 	/// </summary>
-	public abstract class Random32 : Random
+	public abstract class Random32 : IRandomEngine
 	{
 		#region Member
 
@@ -38,10 +38,13 @@ namespace Litdex.Random
 		#region Public Method
 
 		/// <inheritdoc/>
-		public override string AlgorithmName()
+		public virtual string AlgorithmName()
 		{
 			return "Random32";
 		}
+
+		/// <inheritdoc/>
+		public abstract void Reseed();
 
 		/// <summary>
 		///	Set RNG internal state manually.
@@ -72,19 +75,19 @@ namespace Litdex.Random
 		}
 
 		/// <inheritdoc/>
-		public override bool NextBoolean()
+		public bool NextBoolean()
 		{
 			return this.NextUInt() >> 31 == 0;
 		}
 
 		/// <inheritdoc/>
-		public override byte NextByte()
+		public byte NextByte()
 		{
 			return (byte)(this.Next() >> 24);
 		}
 
 		/// <inheritdoc/>
-		public override byte[] NextBytes(int length)
+		public byte[] NextBytes(int length)
 		{
 			if (length <= 0)
 			{
@@ -97,7 +100,7 @@ namespace Litdex.Random
 		}
 
 		/// <inheritdoc/>
-		public override void Fill(byte[] buffer)
+		public void Fill(byte[] buffer)
 		{
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 			var span = new Span<byte>(buffer);
@@ -141,7 +144,7 @@ namespace Litdex.Random
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 
 		/// <inheritdoc/>
-		public override void Fill(Span<byte> buffer)
+		public void Fill(Span<byte> buffer)
 		{
 			if (buffer.Length <= 0 || buffer == null)
 			{
@@ -165,29 +168,29 @@ namespace Litdex.Random
 				}
 			}
 		}
-		
+
 #endif
 
 		/// <inheritdoc/>
-		public override int NextInt()
+		public int NextInt()
 		{
-			return (int)(this.Next() >> 1);
+			return (int)(this.Next());
 		}
 
 		/// <inheritdoc/>
-		public override uint NextUInt()
+		public uint NextUInt()
 		{
 			return this.Next();
 		}
 
 		/// <inheritdoc/>
-		public override long NextInt64()
+		public long NextInt64()
 		{
-			return (long)(this.NextUInt64() >> 1);
+			return (long)(this.NextUInt64());
 		}
 
 		/// <inheritdoc/>
-		public override ulong NextUInt64()
+		public ulong NextUInt64()
 		{
 			ulong high = this.NextUInt();
 			ulong low = this.NextUInt();

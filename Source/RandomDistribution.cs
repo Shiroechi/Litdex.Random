@@ -2,7 +2,7 @@
 
 namespace Litdex.Random
 {
-	public abstract partial class Random
+	public partial class Random
 	{
 		/// <summary>
 		///	Hold a copy of gaussian number.
@@ -26,7 +26,7 @@ namespace Litdex.Random
 		/// Alpha or Beta", "Alpha or beta can't be negative or lower than 0.
 		/// </exception>
 		public virtual double BetaDistribution(double alpha, double beta)
-		{ 
+		{
 			if (alpha < 0.0 || beta < 0.0)
 			{
 				throw new ArgumentOutOfRangeException("Alpha or Beta", "Alpha or beta can't be negative or lower than 0.");

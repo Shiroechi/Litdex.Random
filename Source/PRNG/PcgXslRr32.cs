@@ -3,20 +3,20 @@
 namespace Litdex.Random.PRNG
 {
 	/// <summary>
-	///	A Permuted Congruential Generator (PCG) that is composed of 
-	///	a 64-bit Linear Congruential Generator (LCG) combined with 
-	///	the XSH-RR (xorshift; random rotate) output transformation 
-	///	to create 32-bit output.
+	/// A Permuted Congruential Generator (PCG) that is composed of
+	/// a 64-bit Linear Congruential Generator (LCG) combined with 
+	/// the XSL-RR(xorshift low bits; random rotate) output transformation
+	/// to create 32-bit output.
 	/// </summary>
 	/// <remarks>
 	///	Source: https://www.pcg-random.org/
 	/// </remarks>
-	public class PcgXshRr32 : Pcg32Base
+	public class PcgXslRr32 : Pcg32Base
 	{
 		#region Constructor & Destructor
 
 		/// <summary>
-		///	Create an instance of <see cref="PcgXshRr32"/> object.
+		///	Create an instance of <see cref="PcgXslRr32"/> object.
 		/// </summary>
 		/// <param name="seed">
 		///	RNG seed.
@@ -24,16 +24,13 @@ namespace Litdex.Random.PRNG
 		/// <param name="increment">
 		///	Increment step.
 		///	</param>
-		public PcgXshRr32(ulong seed = 0, ulong increment = 0)
+		public PcgXslRr32(ulong seed = 0, ulong increment = 0)
 		{
-			this._State = new uint[1]; // not used, but initilized
+			this._State = new uint[1];
 			this.SetSeed(seed, increment);
 		}
 
-		/// <summary>
-		///	Destructor.
-		/// </summary>
-		~PcgXshRr32()
+		~PcgXslRr32()
 		{
 			this._State0 = 0;
 			this._Increment = 0;
@@ -47,20 +44,21 @@ namespace Litdex.Random.PRNG
 		protected override uint Next()
 		{
 			var oldState = this._State0;
-			this._State0 = (oldState * _PCG_Multiplier_64) + (this._Increment | 1);
-			var xorshifted = (uint)(((oldState >> 18) ^ oldState) >> 27);
-			var rot = (int)(oldState >> 59);
-			return xorshifted.RotateRight(rot);
+			this._State0 = this._State0 * _PCG_Multiplier_64 + this._Increment;
+
+			var xorshift = ((uint)(oldState >> 32)) ^ (uint)oldState;
+			int rotate = (int)(oldState >> 59);
+			return xorshift.RotateRight(rotate);
 		}
 
 		#endregion Protected Method
-
+		
 		#region Public Method
-
+		
 		/// <inheritdoc/>
 		public override string AlgorithmName()
 		{
-			return "PCG XSH-RR 32-bit";
+			return "PCG XSL RR 32-bit";
 		}
 
 		#endregion Public Method

@@ -9,8 +9,8 @@
 	/// <remarks>
 	///	Source: https://www.pcg-random.org/
 	/// </remarks>
-	public class PcgXshRs32 : PcgXshRr32
-	{
+	public class PcgXshRs32 : Pcg32Base
+	{ 
 		#region Constructor & Destructor
 
 		/// <summary>
@@ -43,10 +43,12 @@
 		/// <inheritdoc/>
 		protected override uint Next()
 		{
-			var oldseed = this._State0;
-			this._State0 = (oldseed * 6364136223846793005) + (this._Increment | 1);
-			var rot = (int)(oldseed >> 61);
-			return (uint)(oldseed ^ (oldseed >> 22)) >> (22 + rot);
+			var oldState = this._State0;
+			
+			this._State0 = (oldState * 6364136223846793005) + (this._Increment | 1);
+			
+			var rot = (int)(oldState >> 61);
+			return (uint)(oldState ^ (oldState >> 22)) >> (22 + rot);
 		}
 
 		#endregion Protected Method

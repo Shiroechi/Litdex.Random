@@ -5,6 +5,7 @@ using System.Buffers.Binary;
 using System;
 using System.Security.Cryptography;
 
+using Litdex.Utilities;
 using Litdex.Utilities.Extension;
 
 namespace Litdex.Random.PRNG
@@ -130,14 +131,14 @@ namespace Litdex.Random.PRNG
 				var bytes = new byte[64];
 				rng.GetNonZeroBytes(bytes);
 				this.SetSeed(
-					seed1: BitConverter.ToUInt64(bytes, 0),
-					seed2: BitConverter.ToUInt64(bytes, 8),
-					seed3: BitConverter.ToUInt64(bytes, 16),
-					seed4: BitConverter.ToUInt64(bytes, 24),
-					seed5: BitConverter.ToUInt64(bytes, 32),
-					seed6: BitConverter.ToUInt64(bytes, 40),
-					seed7: BitConverter.ToUInt64(bytes, 48),
-					seed8: BitConverter.ToUInt64(bytes, 56));
+					seed1: BinaryConverter.ToUInt64(bytes, 0),
+					seed2: BinaryConverter.ToUInt64(bytes, 8),
+					seed3: BinaryConverter.ToUInt64(bytes, 16),
+					seed4: BinaryConverter.ToUInt64(bytes, 24),
+					seed5: BinaryConverter.ToUInt64(bytes, 32),
+					seed6: BinaryConverter.ToUInt64(bytes, 40),
+					seed7: BinaryConverter.ToUInt64(bytes, 48),
+					seed8: BinaryConverter.ToUInt64(bytes, 56));
 #endif
 			}
 		}
