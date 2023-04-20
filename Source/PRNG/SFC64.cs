@@ -25,6 +25,11 @@ namespace Litdex.Random.PRNG
 	{
 		#region Member
 
+		/// <summary>
+		///	The internal state of RNG.
+		/// </summary>
+		protected ulong[] _State;
+
 		private ulong _Counter;
 
 		#endregion Member
@@ -170,8 +175,19 @@ namespace Litdex.Random.PRNG
 			this.SetSeed(seed[0], seed[1], seed[2], counter);
 		}
 
-		/// <inheritdoc/>
-		public override void SetSeed(params ulong[] seed)
+		/// <summary>
+		///	Set RNG internal state manually.
+		/// </summary>
+		/// <param name="seed">
+		///	Number to generate the random numbers.
+		/// </param>
+		/// <exception cref="ArgumentNullException">
+		///	Array of seed is null or empty.
+		/// </exception>
+		/// <exception cref="ArgumentException">
+		///	Seed amount must same as the internal state amount.
+		/// </exception>
+		public void SetSeed(params ulong[] seed)
 		{
 			if (seed == null || seed.Length == 0)
 			{

@@ -18,7 +18,16 @@ namespace Litdex.Random.PRNG
 	/// </remarks>
 	public class RomuDuoJr : Random64
 	{
-#region Constructor & Destructor
+		#region Member
+
+		/// <summary>
+		///	The internal state of RNG.
+		/// </summary>
+		protected ulong[] _State;
+
+		#endregion Member
+
+		#region Constructor & Destructor
 
 		/// <summary>
 		///	Create an instance of <see cref="RomuDuoJr"/> object.
@@ -55,9 +64,9 @@ namespace Litdex.Random.PRNG
 			Array.Clear(this._State, 0, this._State.Length);
 		}
 
-#endregion Constructor & Destructor
+		#endregion Constructor & Destructor
 
-#region Protected Method
+		#region Protected Method
 
 		/// <inheritdoc/>
 		protected override ulong Next()
@@ -69,9 +78,9 @@ namespace Litdex.Random.PRNG
 			return xp;
 		}
 
-#endregion Protected Method
+		#endregion Protected Method
 
-#region Public Method
+		#region Public Method
 
 		/// <inheritdoc/>
 		public override string AlgorithmName()
@@ -115,6 +124,34 @@ namespace Litdex.Random.PRNG
 			this._State[1] = seed2;
 		}
 
-#endregion Public Method
+		/// <summary>
+		///	Set RNG internal state manually.
+		/// </summary>
+		/// <param name="seed">
+		///	Number to generate the random numbers.
+		/// </param>
+		/// <exception cref="ArgumentNullException">
+		///	Array of seed is null or empty.
+		/// </exception>
+		/// <exception cref="ArgumentException">
+		///	Seed amount must same as the internal state amount.
+		/// </exception>
+		public virtual void SetSeed(params ulong[] seed)
+		{
+			if (seed == null || seed.Length == 0)
+			{
+				throw new ArgumentNullException(nameof(seed), "Seed can't null or empty.");
+			}
+
+			if (seed.Length < this._State.Length)
+			{
+				throw new ArgumentException($"Seed need at least {this._State.Length} numbers.", nameof(seed));
+			}
+
+			var length = seed.Length > this._State.Length ? this._State.Length : seed.Length;
+			Array.Copy(seed, 0, this._State, 0, length);
+		}
+
+		#endregion Public Method
 	}
 }

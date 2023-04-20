@@ -14,7 +14,7 @@ namespace Litdex.Random.PRNG
 	/// <remarks>
 	///	Source: https://arxiv.org/abs/1704.00358
 	/// </remarks>
-	public class MiddleSquareWeylSequence : Random32
+	public class MiddleSquareWeylSequence32 : Random32
 	{
 		#region Member
 
@@ -27,21 +27,20 @@ namespace Litdex.Random.PRNG
 		#region Constructor & Destructor
 
 		/// <summary>
-		///	Create an instance of <see cref="MiddleSquareWeylSequence"/> object.
+		///	Create an instance of <see cref="MiddleSquareWeylSequence32"/> object.
 		/// </summary>
 		/// <param name="seed">
 		///	RNG seed.
 		///	</param>
-		public MiddleSquareWeylSequence(ulong seed = 0)
+		public MiddleSquareWeylSequence32(ulong seed = 0)
 		{
-			this._State = new uint[2];
 			this.SetSeed(seed);
 		}
 
 		/// <summary>
 		///	Destructor.
 		/// </summary>
-		~MiddleSquareWeylSequence()
+		~MiddleSquareWeylSequence32()
 		{
 			this._Output = 0;
 			this._Sequence = 0;
@@ -56,7 +55,7 @@ namespace Litdex.Random.PRNG
 		protected override uint Next()
 		{
 			this._Output *= this._Output;
-			this._Output += this._Sequence += this._Increment;
+			this._Output += (this._Sequence += this._Increment);
 			this._Output = (this._Output >> 32) | (this._Output << 32);
 			return (uint)this._Output;
 		}
@@ -68,7 +67,7 @@ namespace Litdex.Random.PRNG
 		/// <inheritdoc/>
 		public override string AlgorithmName()
 		{
-			return "Middle Square Weyl Sequence";
+			return "Middle Square Weyl Sequence 32-bit";
 		}
 
 		/// <inheritdoc/>
@@ -100,6 +99,11 @@ namespace Litdex.Random.PRNG
 		{
 			this._Output = seed;
 			this._Sequence = seed;
+		}
+
+		public void Jump()
+		{
+
 		}
 
 		#endregion Public Method

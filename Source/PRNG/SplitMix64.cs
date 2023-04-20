@@ -16,6 +16,11 @@ namespace Litdex.Random.PRNG
 	public class SplitMix64 : Random64
 	{
 		/// <summary>
+		///	The internal state of RNG.
+		/// </summary>
+		protected ulong _State;
+
+		/// <summary>
 		///	Create an instance of <see cref="SplitMix64"/> object.
 		/// </summary>
 		/// <param name="seed">
@@ -23,7 +28,6 @@ namespace Litdex.Random.PRNG
 		/// </param>
 		public SplitMix64(ulong seed = 0)
 		{
-			this._State = new ulong[1];
 			this.SetSeed(seed);
 		}
 
@@ -32,7 +36,7 @@ namespace Litdex.Random.PRNG
 		/// </summary>
 		~SplitMix64()
 		{
-			this._State[0] = 0;
+			this._State = 0;
 		}
 
 		#region Protected Method
@@ -40,8 +44,8 @@ namespace Litdex.Random.PRNG
 		/// <inheritdoc/>
 		protected override ulong Next()
 		{
-			this._State[0] += 0x9E3779B97F4A7C15u;
-			var result = this._State[0];
+			this._State += 0x9E3779B97F4A7C15u;
+			var result = this._State;
 			result = (result ^ (result >> 30)) * 0xBF58476D1CE4E5B9u;
 			result = (result ^ (result >> 27)) * 0x94D049BB133111EBu;
 			return result ^ (result >> 31);
@@ -82,7 +86,7 @@ namespace Litdex.Random.PRNG
 		/// </param>
 		public void SetSeed(ulong seed)
 		{
-			this._State[0] = seed;
+			this._State = seed;
 		}
 
 		#endregion Public Method

@@ -29,6 +29,10 @@ namespace Litdex.Random.PRNG
 
 		// Note: While it is an array, a "lane" refers to 4 consecutive ulong.
 		// RNG state.
+		/// <summary>
+		///	The internal state of RNG.
+		/// </summary>
+		protected ulong[] _State;
 		private ulong[] _Output = new ulong[16]; // 4 lanes, 2 parts
 		private ulong[] _Counter = new ulong[4]; // 1 lane
 
@@ -181,7 +185,7 @@ namespace Litdex.Random.PRNG
 		}
 
 		///	<inheritdoc/>
-		public override void SetSeed(params ulong[] seed)
+		public void SetSeed(params ulong[] seed)
 		{
 			if (seed.Length < 4 || seed == null)
 			{

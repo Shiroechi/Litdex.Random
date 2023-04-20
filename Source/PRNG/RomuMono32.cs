@@ -19,6 +19,15 @@ namespace Litdex.Random.PRNG
 	/// </remarks>
 	public class RomuMono32 : Random32
 	{
+		#region Member
+
+		/// <summary>
+		///	The internal state of RNG.
+		/// </summary>
+		protected uint _State;
+
+		#endregion Member
+
 		#region Constructor & Destructor
 
 		/// <summary>
@@ -29,13 +38,12 @@ namespace Litdex.Random.PRNG
 		/// </param>
 		public RomuMono32(uint seed = 0)
 		{
-			this._State = new uint[1];
 			this.SetSeed(seed);
 		}
 
 		~RomuMono32()
 		{
-			this._State[0] = 0;
+			this._State = 0;
 		}
 
 		#endregion Constructor & Destructor
@@ -45,9 +53,9 @@ namespace Litdex.Random.PRNG
 		/// <inheritdoc/>
 		protected override uint Next()
 		{
-			uint result = this._State[0] >> 16;
-			this._State[0] *= 3611795771u;
-			this._State[0] = this._State[0].RotateLeft(12);
+			uint result = this._State >> 16;
+			this._State *= 3611795771u;
+			this._State = this._State.RotateLeft(12);
 			return result;
 		}
 
@@ -86,24 +94,24 @@ namespace Litdex.Random.PRNG
 		/// </param>
 		public void SetSeed(uint seed)
 		{
-			this._State[0] = (seed & 0x1fffffffu) + 1156979152u;  // Accepts 29 seed-bits.;
+			this._State = (seed & 0x1fffffffu) + 1156979152u;  // Accepts 29 seed-bits.;
 		}
 
-		/// <inheritdoc/>
-		public override void SetSeed(params uint[] seed)
-		{
-			if (seed == null || seed.Length == 0)
-			{
-				throw new ArgumentNullException(nameof(seed), "Seed can't null or empty.");
-			}
+		///// <inheritdoc/>
+		//public override void SetSeed(params uint[] seed)
+		//{
+		//	if (seed == null || seed.Length == 0)
+		//	{
+		//		throw new ArgumentNullException(nameof(seed), "Seed can't null or empty.");
+		//	}
 
-			if (seed.Length < this._State.Length)
-			{
-				throw new ArgumentException($"Seed need at least {this._State.Length} numbers.", nameof(seed));
-			}
+		//	if (seed.Length < this._State.Length)
+		//	{
+		//		throw new ArgumentException($"Seed need at least {this._State.Length} numbers.", nameof(seed));
+		//	}
 
-			this.SetSeed(seed[0]);
-		}
+		//	this.SetSeed(seed[0]);
+		//}
 
 		#endregion Public Method
 	}

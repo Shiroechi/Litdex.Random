@@ -14,6 +14,15 @@ namespace Litdex.Random.PRNG
 	/// </summary>
 	public class GJrand64 : Random64
 	{
+		#region Member
+
+		/// <summary>
+		///	The internal state of RNG.
+		/// </summary>
+		protected ulong[] _State;
+
+		#endregion Member
+
 		#region Constructor & Destructor
 
 		/// <summary>
@@ -131,8 +140,19 @@ namespace Litdex.Random.PRNG
 			}
 		}
 
-		/// <inheritdoc/>
-		public override void SetSeed(params ulong[] seed)
+		/// <summary>
+		///	Set RNG internal state manually.
+		/// </summary>
+		/// <param name="seed">
+		///	Number to generate the random numbers.
+		/// </param>
+		/// <exception cref="ArgumentNullException">
+		///	Array of seed is null or empty.
+		/// </exception>
+		/// <exception cref="ArgumentException">
+		///	Seed amount must same as the internal state amount.
+		/// </exception>
+		public void SetSeed(params ulong[] seed)
 		{
 			if (seed == null || seed.Length == 0)
 			{

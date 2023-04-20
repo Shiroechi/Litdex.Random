@@ -41,10 +41,9 @@ namespace Litdex.Random.PRNG
 		/// <param name="seed8">
 		///	Eighth RNG seed.
 		/// </param>
-		public Xoshiro512StarStar(ulong seed1 = 0, ulong seed2 = 0, ulong seed3 = 0, ulong seed4 = 0, ulong seed5 = 0, ulong seed6 = 0, ulong seed7 = 0, ulong seed8 = 0)
+		public Xoshiro512StarStar(ulong seed1 = 0, ulong seed2 = 0, ulong seed3 = 0, ulong seed4 = 0, ulong seed5 = 0, ulong seed6 = 0, ulong seed7 = 0, ulong seed8 = 0) : base(seed1, seed2, seed3, seed4, seed5, seed6, seed7)
 		{
-			this._State = new ulong[8];
-			this.SetSeed(seed1, seed2, seed3, seed4, seed5, seed6, seed7, seed8);
+
 		}
 
 		/// <summary>

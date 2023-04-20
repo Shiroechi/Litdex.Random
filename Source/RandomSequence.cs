@@ -30,7 +30,7 @@ namespace Litdex.Random
 		/// </exception>
 		public virtual T Choice<T>(T[] items)
 		{
-			if (items.Length <= 0 || items == null)
+			if (items == null || items.Length <= 0)
 			{
 				ThrowNullArray();
 			}
@@ -67,27 +67,27 @@ namespace Litdex.Random
 			{
 				ThrowNullArray();
 			}
+			var length = items.Length;
 
 			if (select < 0)
 			{
 				throw new ArgumentOutOfRangeException(nameof(select), "The number of elements to be retrieved is negative or less than 1.");
 			}
-			else if (select > items.Length)
+			else if (select > length)
 			{
 				throw new ArgumentOutOfRangeException(nameof(select), "The number of elements to be retrieved exceeds the items size.");
 			}
-			else if (select == items.Length)
+			else if (select == length)
 			{
 				return items;
 			}
 
 			var selected = new T[select];
 			uint index;
-			uint length = (uint)(items.Length - 1);
 
 			for (var i = 0; i < select; i++)
 			{
-				index = this.NextUInt(0, length);
+				index = this.NextUInt(0, (uint)length - 1);
 				selected[i] = items[index];
 			}
 
@@ -148,7 +148,7 @@ namespace Litdex.Random
 		/// </exception>
 		public virtual Task<T[]> ChoiceAsync<T>(T[] items, int select, CancellationToken cancellationToken)
 		{
-			return Task.Factory.StartNew(() =>
+			return Task.Run(() =>
 			{
 				return this.Choice(items, select);
 			}, cancellationToken);
@@ -206,31 +206,32 @@ namespace Litdex.Random
 		/// </exception>
 		public virtual T[] Choice<T>(IEnumerable<T> items, int select)
 		{
-			if (!items.Any() || items == null)
+			if (items == null || !items.Any())
 			{
 				ThrowNullArray();
 			}
+
+			var length = items.Count();
 
 			if (select < 0)
 			{
 				throw new ArgumentOutOfRangeException(nameof(select), "The number of elements to be retrieved is negative or less than 1.");
 			}
-			else if (select > items.Count())
+			else if (select > length)
 			{
 				throw new ArgumentOutOfRangeException(nameof(select), "The number of elements to be retrieved exceeds the items size.");
 			}
-			else if (select == items.Count())
+			else if (select == length)
 			{
 				return items.ToArray();
 			}
 
 			var selected = new T[select];
 			uint index;
-			uint length = (uint)(items.Count() - 1);
 
 			for (var i = 0; i < select; i++)
 			{
-				index = this.NextUInt(0, length);
+				index = this.NextUInt(0, (uint)length - 1);
 				selected[i] = items.ElementAt((int)index);
 			}
 
@@ -291,11 +292,15 @@ namespace Litdex.Random
 		/// </exception>
 		public virtual Task<T[]> ChoiceAsync<T>(IEnumerable<T> items, int select, CancellationToken cancellationToken)
 		{
-			return Task.Factory.StartNew(() =>
+			return Task.Run(() =>
 			{
 				return this.Choice(items, select);
 			}, cancellationToken);
 		}
+
+		#endregion Choice
+
+		#region Sample
 
 		/// <summary>
 		///	Select arbitrary distinct element randomly.
@@ -323,7 +328,7 @@ namespace Litdex.Random
 		/// </exception>
 		public virtual T[] Sample<T>(T[] items, int select)
 		{
-			if (items.Length <= 0 || items == null)
+			if (items == null || items.Length <= 0)
 			{
 				ThrowNullArray();
 			}
@@ -332,11 +337,11 @@ namespace Litdex.Random
 			{
 				throw new ArgumentException("The number of elements to be retrieved is negative or less than 1.", nameof(select));
 			}
-			else if (select > items.Length)
-			{
-				throw new ArgumentOutOfRangeException(nameof(select), "The number of elements to be retrieved exceeds the items size.");
-			}
-			else if (select == items.Length)
+			//else if (select > items.Length)
+			//{
+			//	throw new ArgumentOutOfRangeException(nameof(select), "The number of elements to be retrieved exceeds the items size.");
+			//}
+			else if (select >= items.Length)
 			{
 				return items;
 			}
@@ -344,8 +349,11 @@ namespace Litdex.Random
 			var reservoir = new T[select];
 			int index;
 
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+			items.AsSpan(0, select).CopyTo(reservoir);
+#else
 			Array.Copy(items, 0, reservoir, 0, reservoir.Length);
-
+#endif
 			for (var i = select; i < items.Length; i++)
 			{
 				index = (int)this.NextUInt(0, (uint)i);
@@ -358,10 +366,6 @@ namespace Litdex.Random
 
 			return reservoir;
 		}
-
-		#endregion Choice
-
-		#region Sample
 
 		/// <summary>
 		///	Select arbitrary distinct element randomly.
@@ -427,7 +431,7 @@ namespace Litdex.Random
 		/// </exception>
 		public virtual Task<T[]> SampleAsync<T>(T[] items, int select, CancellationToken cancellationToken)
 		{
-			return Task.Factory.StartNew(() =>
+			return Task.Run(() =>
 			{
 				return this.Sample(items, select);
 			}, cancellationToken);
@@ -459,20 +463,22 @@ namespace Litdex.Random
 		/// </exception>
 		public virtual T[] Sample<T>(IEnumerable<T> items, int select)
 		{
-			if (items.Any() || items == null)
+			if (items == null || items.Any())
 			{
 				ThrowNullArray();
 			}
+
+			var length = items.Count();
 
 			if (select <= 0)
 			{
 				throw new ArgumentException("The number of elements to be retrieved is negative or less than 1.", nameof(select));
 			}
-			else if (select > items.Count())
-			{
-				throw new ArgumentOutOfRangeException(nameof(select), "The number of elements to be retrieved exceeds the items size.");
-			}
-			else if (select == items.Count())
+			//else if (select > length)
+			//{
+			//	throw new ArgumentOutOfRangeException(nameof(select), "The number of elements to be retrieved exceeds the items size.");
+			//}
+			else if (select >= length)
 			{
 				return items.ToArray();
 			}
@@ -485,7 +491,7 @@ namespace Litdex.Random
 				reservoir[i] = items.ElementAt(i);
 			}
 
-			for (var i = select; i < items.Count(); i++)
+			for (var i = select; i < length; i++)
 			{
 				index = (int)this.NextUInt(0, (uint)i);
 
@@ -562,7 +568,7 @@ namespace Litdex.Random
 		/// </exception>
 		public virtual Task<T[]> SampleAsync<T>(IEnumerable<T> items, int select, CancellationToken cancellationToken)
 		{
-			return Task.Factory.StartNew(() =>
+			return Task.Run(() =>
 			{
 				return this.Sample(items, select);
 			}, cancellationToken);
@@ -589,13 +595,18 @@ namespace Litdex.Random
 		/// </exception>
 		public virtual T[] Shuffle<T>(T[] items)
 		{
-			if (items.Length <= 0 || items == null)
+			if (items == null || items.Length <= 0)
 			{
 				ThrowNullArray();
 			}
 
 			var newArray = new T[items.Length];
+
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+			items.AsSpan(0, items.Length).CopyTo(newArray);
+#else
 			Array.Copy(items, newArray, newArray.Length);
+#endif
 
 			T temp;
 			for (var i = newArray.Length - 1; i > 1; i--)
@@ -655,7 +666,7 @@ namespace Litdex.Random
 		/// </exception>
 		public virtual Task<T[]> ShuffleAsync<T>(T[] items, CancellationToken cancellationToken)
 		{
-			return Task.Factory.StartNew(() =>
+			return Task.Run(() =>
 			{
 				return this.Shuffle(items);
 			}, cancellationToken);
@@ -744,7 +755,7 @@ namespace Litdex.Random
 		/// </exception>
 		public virtual void ShuffleInPlace<T>(T[] items)
 		{
-			if (items.Length <= 0 || items == null)
+			if (items == null || items.Length <= 0)
 			{
 				ThrowNullArray();
 			}
@@ -806,7 +817,7 @@ namespace Litdex.Random
 		/// </exception>
 		public virtual Task ShuffleInPlaceAsync<T>(T[] items, CancellationToken cancellationToken)
 		{
-			return Task.Factory.StartNew(() =>
+			return Task.Run(() =>
 			{
 				this.ShuffleInPlace(items);
 			}, cancellationToken);
@@ -826,7 +837,7 @@ namespace Litdex.Random
 		/// </exception>
 		public virtual void ShuffleInPlace<T>(IList<T> items)
 		{
-			if (items.Count <= 0 || items == null)
+			if (items == null || items.Count <= 0)
 			{
 				ThrowNullArray();
 			}
@@ -888,7 +899,7 @@ namespace Litdex.Random
 		/// </exception>
 		public virtual Task ShuffleInPlaceAsync<T>(IList<T> items, CancellationToken cancellationToken)
 		{
-			return Task.Factory.StartNew(() =>
+			return Task.Run(() =>
 			{
 				this.ShuffleInPlace(items);
 			}, cancellationToken);

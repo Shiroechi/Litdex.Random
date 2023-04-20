@@ -16,6 +16,15 @@ namespace Litdex.Random.PRNG
 	/// </remarks>
 	public class Tyche : Random32
 	{
+		#region Member
+
+		/// <summary>
+		///	The internal state of RNG.
+		/// </summary>
+        protected uint[] _State;
+
+		#endregion Member
+
 		#region Constructor & Destructor
 
 		/// <summary>
@@ -138,25 +147,25 @@ namespace Litdex.Random.PRNG
 			this.Init(seed, idx);
 		}
 
-		/// <inheritdoc/>
-		public override void SetSeed(params uint[] seed)
-		{
-			if (seed == null || seed.Length == 0)
-			{
-				throw new ArgumentNullException(nameof(seed), "Seed can't null or empty.");
-			}
+		///// <inheritdoc/>
+		//public override void SetSeed(params uint[] seed)
+		//{
+		//	if (seed == null || seed.Length == 0)
+		//	{
+		//		throw new ArgumentNullException(nameof(seed), "Seed can't null or empty.");
+		//	}
 
-			if (seed.Length < this._State.Length)
-			{
-				throw new ArgumentException($"Seed need at least {this._State.Length} numbers.", nameof(seed));
-			}
+		//	if (seed.Length < this._State.Length)
+		//	{
+		//		throw new ArgumentException($"Seed need at least {this._State.Length} numbers.", nameof(seed));
+		//	}
 
-			ulong a, b;
-			a = seed[0];
-			b = seed[1];
+		//	ulong a, b;
+		//	a = seed[0];
+		//	b = seed[1];
 
-			this.Init(a << 32 | b, seed[2]);
-		}
+		//	this.Init(a << 32 | b, seed[2]);
+		//}
 
 		#endregion Public Method
 	}

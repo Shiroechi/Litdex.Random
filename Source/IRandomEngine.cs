@@ -8,7 +8,6 @@ namespace Litdex.Random
 	/// </summary>
 	public interface IRandomEngine
 	{
-
 		#region Public Method
 
 		/// <summary>

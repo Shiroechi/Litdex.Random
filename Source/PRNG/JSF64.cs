@@ -17,6 +17,15 @@ namespace Litdex.Random.PRNG
 	/// </remarks>
 	public class JSF64 : Random64
 	{
+		#region Member
+
+		/// <summary>
+		///	The internal state of RNG.
+		/// </summary>
+		protected ulong[] _State;
+
+		#endregion Member
+
 		#region Constructor & Destructor
 
 		/// <summary>
@@ -97,9 +106,16 @@ namespace Litdex.Random.PRNG
 				this.Next();
 			}
 		}
-
-		/// <inheritdoc/>
-		public override void SetSeed(params ulong[] seed)
+		/// <summary>
+		///	Set RNG internal state manually.
+		/// </summary>
+		/// <param name="seed">
+		///	Number to generate the random numbers.
+		/// </param>
+		/// <exception cref="ArgumentNullException">
+		///	Array of seed is null or empty.
+		/// </exception>
+		public void SetSeed(params ulong[] seed)
 		{
 			if (seed == null || seed.Length == 0)
 			{

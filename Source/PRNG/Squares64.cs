@@ -1,4 +1,5 @@
 ﻿#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+using System;
 using System.Buffers.Binary;
 #endif
 using System.Security.Cryptography;
@@ -8,16 +9,16 @@ using Litdex.Utilities;
 namespace Litdex.Random.PRNG
 {
 	/// <summary>
-	///	Counter-based RNG based on <see cref="MiddleSquareWeylSequence"/>.
+	///	Counter-based RNG based on <see cref="MiddleSquareWeylSequence32"/>.
 	/// </summary>
 	/// <remarks>
 	///	Source: https://arxiv.org/pdf/2004.06278.pdf
 	/// </remarks>
-	public class Squares : Random32
+	public class Squares64 : Random64
 	{
 		#region Member
 
-		private ulong _Key = 0xc58efd154ce32f6d; // first key in key.h
+		private ulong _Key = 0x5d8491e219f6537d; // last key in key.h
 		private ulong _Counter = 0;
 
 		#endregion Member
@@ -25,7 +26,7 @@ namespace Litdex.Random.PRNG
 		#region Constructor & Destructor
 
 		/// <summary>
-		///	Create an instance of <see cref="Squares"/> object.
+		///	Create an instance of <see cref="Squares64"/> object.
 		/// </summary>
 		/// <param name="ctr">
 		///	Counter start number.
@@ -33,13 +34,12 @@ namespace Litdex.Random.PRNG
 		/// <param name="key">
 		///	RNG seed.
 		/// </param>
-		public Squares(ulong ctr = 0, ulong key = 0)
+		public Squares64(ulong ctr = 0, ulong key = 0)
 		{
-			this._State = new uint[1];
 			this.SetSeed(ctr, key);
 		}
 
-		~Squares()
+		~Squares64()
 		{
 			this._Counter = 0;
 			this._Key = 0;
@@ -50,7 +50,7 @@ namespace Litdex.Random.PRNG
 		#region Protected Method
 
 		/// <inheritdoc/>
-		protected override uint Next()
+		protected override ulong Next()
 		{
 			this._Counter++;
 			return this.Next(this._Counter, this._Key);
@@ -68,9 +68,10 @@ namespace Litdex.Random.PRNG
 		/// <returns>
 		///	Next random sequence.
 		/// </returns>
-		protected uint Next(ulong ctr, ulong key)
+		protected ulong Next(ulong ctr, ulong key)
 		{
-			ulong x, y, z;
+			ulong t, x, y, z;
+
 			y = x = ctr * key;
 			z = y + key;
 
@@ -87,7 +88,10 @@ namespace Litdex.Random.PRNG
 			x = (x >> 32) | (x << 32);
 
 			// round 4
-			return (uint)((x * x) + z) >> 32;
+			t = x = x * x + z;
+			x = (x >> 32) | (x << 32);
+
+			return t ^ ((x * x + y) >> 32);
 		}
 
 		#endregion Protected Method
@@ -97,7 +101,7 @@ namespace Litdex.Random.PRNG
 		/// <inheritdoc/>
 		public override string AlgorithmName()
 		{
-			return "Squares";
+			return "Squares 64-bit";
 		}
 
 		/// <inheritdoc/>
@@ -139,7 +143,7 @@ namespace Litdex.Random.PRNG
 			}
 			else
 			{
-				this._Key = 0xc58efd154ce32f6d;
+				this._Key = 0x5d8491e219f6537d;
 			}
 		}
 

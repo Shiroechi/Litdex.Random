@@ -20,10 +20,9 @@ namespace Litdex.Random.PRNG
 		/// <param name="seeds">
 		/// RNG seeds.
 		/// </param>
-		public Xoroshiro1024StarStar(params ulong[] seeds)
+		public Xoroshiro1024StarStar(params ulong[] seeds) : base(seeds)
 		{
-			this._State = new ulong[16];
-			this.SetSeed(seeds);
+
 		}
 
 		~Xoroshiro1024StarStar()

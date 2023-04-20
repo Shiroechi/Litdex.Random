@@ -15,7 +15,7 @@ namespace Litdex.Random.PRNG
 		#region Constructor & Destructor
 
 		/// <summary>
-		///	Create an instance of <see cref="Xoroshiro128PlusPlus"/> object.
+		///	Create an instance of <see cref="Xoroshiro128StarStar"/> object.
 		/// </summary>
 		/// <param name="seed1">
 		///	First RNG seed.
@@ -23,10 +23,9 @@ namespace Litdex.Random.PRNG
 		/// <param name="seed2">
 		///	Second RNG seed.
 		/// </param>
-		public Xoroshiro128StarStar(ulong seed1 = 0, ulong seed2 = 0)
+		public Xoroshiro128StarStar(ulong seed1 = 0, ulong seed2 = 0) : base(seed1, seed2)
 		{
-			this._State = new ulong[2];
-			this.SetSeed(seed1, seed2);
+
 		}
 
 		~Xoroshiro128StarStar()

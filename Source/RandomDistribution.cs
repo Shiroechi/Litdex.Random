@@ -81,40 +81,6 @@ namespace Litdex.Random
 		/// <summary>
 		///	Generate gaussian distribution.
 		/// </summary>
-		/// <returns>
-		///	A 64-bit floating point number normal distribution.
-		/// </returns>
-		public virtual double GaussianDistribution()
-		{
-			// See Knuth, ACP, Section 3.4.1 Algorithm C.
-			if (this._HaveNextGaussian == true)
-			{
-				this._HaveNextGaussian = false;
-				return this._NextGaussian;
-			}
-			else
-			{
-				double v1, v2, s;
-
-				do
-				{
-					v1 = 2 * this.NextDouble() - 1; // between -1 and 1
-					v2 = 2 * this.NextDouble() - 1; // between -1 and 1
-					s = v1 * v1 + v2 * v2;
-				} while (s >= 1 || s == 0);
-
-				double multiplier = Math.Sqrt(-2 * Math.Log(s) / s);
-
-				this._NextGaussian = v2 * multiplier;
-				this._HaveNextGaussian = true;
-
-				return v1 * multiplier;
-			}
-		}
-
-		/// <summary>
-		///	Generate gaussian distribution.
-		/// </summary>
 		/// <param name="mean">
 		/// Mean or average value.
 		/// </param>
@@ -129,25 +95,16 @@ namespace Litdex.Random
 			if (this._HaveNextGaussian == true)
 			{
 				this._HaveNextGaussian = false;
-				return this._NextGaussian;
+				return mean + stdDev * this._NextGaussian;
 			}
 			else
 			{
-				double v1, v2, s;
-
-				do
-				{
-					v1 = 2 * this.NextDouble() - 1; // between -1 and 1
-					v2 = 2 * this.NextDouble() - 1; // between -1 and 1
-					s = v1 * v1 + v2 * v2;
-				} while (s >= 1 || s == 0);
-
-				double multiplier = Math.Sqrt(-2 * Math.Log(s) / s);
-
-				this._NextGaussian = mean + ((v2 * multiplier) * stdDev);
-				this._HaveNextGaussian = true;
-
-				return mean + ((v1 * multiplier) * stdDev);
+				double u1 = this.NextDouble();
+				double u2 = this.NextDouble();
+				double z0 = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Cos(2.0 * Math.PI * u2);
+				double z1 = Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2);
+				this._NextGaussian = z1;
+				return mean + stdDev * z0;
 			}
 		}
 
@@ -213,6 +170,7 @@ namespace Litdex.Random
 
 		}
 
+
 		/// <summary>
 		/// Generate laplace distribution.
 		/// </summary>
@@ -225,8 +183,14 @@ namespace Litdex.Random
 		/// <returns>
 		/// A 64-bit floating point number laplace distribution.
 		/// </returns>
+		/// <exception cref="ArgumentException">Scale must be positive.</exception>
 		public virtual double LaplaceDistribution(double mean, double scale)
 		{
+			if (scale <= 0)
+			{
+				throw new ArgumentException("Scale must be positive.");
+			}
+
 			var u = this.NextDouble() - 0.5;
 			return mean - (scale * Math.Sign(u) * Math.Log(1.0 - (2.0 * Math.Abs(u))));
 		}
@@ -248,8 +212,20 @@ namespace Litdex.Random
 		/// <returns>
 		/// A 64-bit floating point number laplace distribution.
 		/// </returns>
+		/// <exception cref="ArgumentException">Lower bound must be less than upper bound.</exception>
+		/// <exception cref="ArgumentException">Mode must be between lower and upper bounds.</exception>
 		public virtual double TriangularDistribution(double lower, double upper, double mode)
 		{
+			if (lower >= upper)
+			{
+				throw new ArgumentException("Lower bound must be less than upper bound.");
+			}
+
+			if (mode < lower || mode > upper)
+			{
+				throw new ArgumentException("Mode must be between lower and upper bounds.");
+			}
+
 			var u = this.NextDouble();
 			if (u < (mode - lower) / (upper - lower))
 			{

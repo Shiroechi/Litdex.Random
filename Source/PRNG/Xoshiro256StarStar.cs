@@ -29,10 +29,9 @@ namespace Litdex.Random.PRNG
 		/// <param name="seed4">
 		///	Fourth RNG seed.
 		/// </param>
-		public Xoshiro256StarStar(ulong seed1 = 0, ulong seed2 = 0, ulong seed3 = 0, ulong seed4 = 0)
+		public Xoshiro256StarStar(ulong seed1 = 0, ulong seed2 = 0, ulong seed3 = 0, ulong seed4 = 0):base(seed1, seed2, seed3, seed4)
 		{
-			this._State = new ulong[4];
-			this.SetSeed(seed1, seed2, seed3, seed4);
+			
 		}
 
 		/// <summary>

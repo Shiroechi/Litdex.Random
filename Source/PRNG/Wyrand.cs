@@ -12,6 +12,15 @@ namespace Litdex.Random.PRNG
 	/// </summary>
 	public class Wyrand : Random64
 	{
+		#region Member
+
+		/// <summary>
+		/// The internal state of RNG.
+		/// </summary>
+		protected ulong _State;
+
+		#endregion Member
+
 		#region Constructor & Destructor
 
 		/// <summary>
@@ -22,7 +31,6 @@ namespace Litdex.Random.PRNG
 		/// </param>
 		public Wyrand(ulong seed = 0)
 		{
-			this._State = new ulong[1];
 			this.SetSeed(seed);
 		}
 
@@ -31,7 +39,7 @@ namespace Litdex.Random.PRNG
 		/// </summary>
 		~Wyrand()
 		{
-			this._State[0] = 0;
+			this._State = 0;
 		}
 
 		#endregion Constructor & Destructor
@@ -41,8 +49,8 @@ namespace Litdex.Random.PRNG
 		/// <inheritdoc/>
 		protected override ulong Next()
 		{
-			this._State[0] += 0xa0761d6478bd642f;
-			var result = this.MUM(this._State[0] ^ 0xe7037ed1a0b428db, this._State[0]);
+			this._State += 0xa0761d6478bd642f;
+			var result = this.MUM(this._State ^ 0xe7037ed1a0b428db, this._State);
 			return result;
 		}
 
@@ -118,7 +126,7 @@ namespace Litdex.Random.PRNG
 		/// </param>
 		public void SetSeed(ulong seed)
 		{
-			this._State[0] = seed;
+			this._State = seed;
 		}
 
 		#endregion Public Method

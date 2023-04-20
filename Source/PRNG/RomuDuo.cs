@@ -3,6 +3,7 @@ using System.Buffers.Binary;
 #endif
 using System;
 using System.Security.Cryptography;
+using System.Transactions;
 
 using Litdex.Utilities;
 using Litdex.Utilities.Extension;
@@ -18,6 +19,15 @@ namespace Litdex.Random.PRNG
 	/// </remarks>
 	public class RomuDuo : Random64
 	{
+		#region Member
+
+		/// <summary>
+		///	The internal state of RNG.
+		/// </summary>
+		protected ulong[] _State;
+
+		#endregion Member
+
 		#region Constructor & Destructor
 
 		/// <summary>
@@ -41,13 +51,27 @@ namespace Litdex.Random.PRNG
 		/// <param name="seed">
 		///	RNG seed numbers.
 		/// </param>
+		/// <exception cref="ArgumentNullException">
+		///	Array of seed is null or empty.
+		/// </exception>
 		/// <exception cref="ArgumentOutOfRangeException">
 		///	Seed need 2 numbers.
 		/// </exception>
 		public RomuDuo(ulong[] seed)
 		{
 			this._State = new ulong[2];
-			this.SetSeed(seed);
+
+			if (seed == null || seed.Length == 0)
+			{
+				throw new ArgumentNullException(nameof(seed), "Seed can't null or empty.");
+			}
+
+			if (seed.Length < this._State.Length)
+			{
+				throw new ArgumentException($"Seed need at least {this._State.Length} numbers.", nameof(seed));
+			}
+
+			this.SetSeed(seed[0], seed[1]);
 		}
 
 		~RomuDuo()

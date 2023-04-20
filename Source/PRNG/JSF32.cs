@@ -17,6 +17,15 @@ namespace Litdex.Random.PRNG
 	/// </remarks>
 	public class JSF32 : Random32
 	{
+		#region Member
+	
+		/// <summary>
+		///	The internal state of RNG.
+		/// </summary>
+		protected uint[] _State;
+
+		#endregion Member
+
 		#region Constructor & Destructor
 
 		/// <summary>
@@ -99,7 +108,7 @@ namespace Litdex.Random.PRNG
 		}
 
 		/// <inheritdoc/>
-		public override void SetSeed(params uint[] seed)
+		public void SetSeed(params uint[] seed)
 		{
 			if (seed == null || seed.Length == 0)
 			{

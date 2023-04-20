@@ -17,6 +17,15 @@ namespace Litdex.Random.PRNG
 	/// </remarks>
 	public class Shioi : Random64
 	{
+		#region Member
+
+		/// <summary>
+		///	The internal state of RNG.
+		/// </summary>
+		protected ulong[] _State;
+
+		#endregion Member
+
 		#region Constructor & Destructor
 
 		/// <summary>
@@ -121,7 +130,33 @@ namespace Litdex.Random.PRNG
 			this._State[0] = seed1;
 			this._State[1] = seed2;
 		}
+		/// <summary>
+		///	Set RNG internal state manually.
+		/// </summary>
+		/// <param name="seed">
+		///	Number to generate the random numbers.
+		/// </param>
+		/// <exception cref="ArgumentNullException">
+		///	Array of seed is null or empty.
+		/// </exception>
+		/// <exception cref="ArgumentException">
+		///	Seed amount must same as the internal state amount.
+		/// </exception>
+		public virtual void SetSeed(params ulong[] seed)
+		{
+			if (seed == null || seed.Length == 0)
+			{
+				throw new ArgumentNullException(nameof(seed), "Seed can't null or empty.");
+			}
 
+			if (seed.Length < this._State.Length)
+			{
+				throw new ArgumentException($"Seed need at least {this._State.Length} numbers.", nameof(seed));
+			}
+
+			var length = seed.Length > this._State.Length ? this._State.Length : seed.Length;
+			Array.Copy(seed, 0, this._State, 0, length);
+		}
 		private void Jump(ulong[] jumppoly)
 		{
 			ulong[] t = { 0, 0 };

@@ -17,6 +17,14 @@ namespace Litdex.Random.PRNG
 	/// </remarks>
 	public class Xoroshiro128Plus : Random64
 	{
+		#region Member
+
+		/// <summary>
+		///	The internal state of RNG.
+		/// </summary>
+		protected ulong[] _State;
+
+		#endregion Member
 		#region Constructor & Destructor
 
 		/// <summary>

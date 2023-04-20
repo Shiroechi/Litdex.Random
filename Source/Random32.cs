@@ -13,7 +13,7 @@ namespace Litdex.Random
 		/// <summary>
 		///	The internal state of RNG.
 		/// </summary>
-		protected uint[] _State;
+		//protected uint[] _State;
 
 		/// <summary>
 		///	<see cref="int"/> and <see cref="uint"/> is 4 bytes.
@@ -58,21 +58,21 @@ namespace Litdex.Random
 		/// <exception cref="ArgumentException">
 		///	Seed amount must same as the internal state amount.
 		/// </exception>
-		public virtual void SetSeed(params uint[] seed)
-		{
-			if (seed == null || seed.Length == 0)
-			{
-				throw new ArgumentNullException(nameof(seed), "Seed can't null or empty.");
-			}
+		//public virtual void SetSeed(params uint[] seed)
+		//{
+		//	if (seed == null || seed.Length == 0)
+		//	{
+		//		throw new ArgumentNullException(nameof(seed), "Seed can't null or empty.");
+		//	}
 
-			if (seed.Length < this._State.Length)
-			{
-				throw new ArgumentException($"Seed need at least {this._State.Length} numbers.", nameof(seed));
-			}
+		//	if (seed.Length < this._State.Length)
+		//	{
+		//		throw new ArgumentException($"Seed need at least {this._State.Length} numbers.", nameof(seed));
+		//	}
 
-			var length = seed.Length > this._State.Length ? this._State.Length : seed.Length;
-			Array.Copy(seed, 0, this._State, 0, length);
-		}
+		//	var length = seed.Length > this._State.Length ? this._State.Length : seed.Length;
+		//	Array.Copy(seed, 0, this._State, 0, length);
+		//}
 
 		/// <inheritdoc/>
 		public bool NextBoolean()
