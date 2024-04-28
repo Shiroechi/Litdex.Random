@@ -170,7 +170,6 @@ namespace Litdex.Random
 
 		}
 
-
 		/// <summary>
 		/// Generate laplace distribution.
 		/// </summary>
