@@ -1,4 +1,11 @@
-﻿using Litdex.Utilities.Extension;
+﻿#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+using System.Buffers.Binary;
+# endif
+using System.Security.Cryptography;
+using System;
+
+using Litdex.Utilities.Extension;
+using Litdex.Utilities;
 
 namespace Litdex.Random.PRNG
 {
@@ -11,8 +18,16 @@ namespace Litdex.Random.PRNG
 	/// <remarks>
 	///	Source: https://www.pcg-random.org/
 	/// </remarks>
-	public class PcgXshRr32 : Pcg32Base
+	public class PcgXshRr32 : Random32
 	{
+		#region Member
+
+		protected ulong _State;
+		protected ulong _Increment = 1442695040888963407;
+		protected const ulong _Multiplier = 6364136223846793005;
+
+		#endregion Member
+
 		#region Constructor & Destructor
 
 		/// <summary>
@@ -24,9 +39,8 @@ namespace Litdex.Random.PRNG
 		/// <param name="increment">
 		///	Increment step.
 		///	</param>
-		public PcgXshRr32(ulong seed = 0, ulong increment = 0)
+		public PcgXshRr32(ulong seed = 0, ulong increment = 1442695040888963407)
 		{
-			this._State = new uint[1]; // not used, but initilized
 			this.SetSeed(seed, increment);
 		}
 
@@ -35,7 +49,7 @@ namespace Litdex.Random.PRNG
 		/// </summary>
 		~PcgXshRr32()
 		{
-			this._State0 = 0;
+			this._State = 0;
 			this._Increment = 0;
 		}
 
@@ -46,8 +60,8 @@ namespace Litdex.Random.PRNG
 		/// <inheritdoc/>
 		protected override uint Next()
 		{
-			var oldState = this._State0;
-			this._State0 = (oldState * _PCG_Multiplier_64) + (this._Increment | 1);
+			var oldState = this._State;
+			this._State = (oldState * _Multiplier) + (this._Increment | 1);
 			var xorshifted = (uint)(((oldState >> 18) ^ oldState) >> 27);
 			var rot = (int)(oldState >> 59);
 			return xorshifted.RotateRight(rot);
@@ -61,6 +75,71 @@ namespace Litdex.Random.PRNG
 		public override string AlgorithmName()
 		{
 			return "PCG XSH-RR 32-bit";
+		}
+
+		/// <inheritdoc/>
+		public override void Reseed()
+		{
+			using (var rng = RandomNumberGenerator.Create())
+			{
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+				Span<byte> span = new byte[4];
+				rng.GetNonZeroBytes(span);
+				this.SetSeed(BinaryPrimitives.ReadUInt32LittleEndian(span));
+#else
+				var bytes = new byte[4];
+				rng.GetNonZeroBytes(bytes);
+				this.SetSeed(BinaryConverter.ToUInt32(bytes, 0));
+#endif
+			}
+		}
+
+		/// <summary>
+		///	Set RNG seed manually.
+		/// </summary>
+		/// <param name="seed">
+		///	RNG seed.
+		/// </param>
+		/// <param name="increment">
+		/// RNG increment.
+		/// </param>
+		public void SetSeed(ulong seed, ulong increment)
+		{
+			this._State = 0;
+			this._Increment = (increment << 1) | 1;
+			this._State = PcgStatic.PcgSetseq64StepR(this._State, this._Increment);
+			this._State += seed;
+			this._State = PcgStatic.PcgSetseq64StepR(this._State, this._Increment);
+		}
+
+		/// <summary>
+		///	Set RNG internal state manually.
+		/// </summary>
+		/// <param name="seed">
+		///	Number to generate the random numbers.
+		/// </param>
+		/// <exception cref="ArgumentNullException">
+		///	Array of seed is null or empty.
+		/// </exception>
+		public void SetSeed(params ulong[] seed)
+		{
+			if (seed == null || seed.Length == 0)
+			{
+				throw new ArgumentNullException(nameof(seed), "Seed can't null or empty.");
+			}
+
+			this.SetSeed(seed[0], seed[1]);
+		}
+
+		/// <summary>
+		/// Advanced the state.
+		/// </summary>
+		/// <param name="delta">
+		/// Number of steps that the generator should advance forward.
+		/// </param>
+		public void Jump(int delta)
+		{
+			this._State = PcgStatic.PcgAdvanceLcg64(this._State, delta);
 		}
 
 		#endregion Public Method
