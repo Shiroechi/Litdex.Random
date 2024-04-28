@@ -122,11 +122,6 @@ namespace Litdex.Random.PRNG
 			this._W2 = seed2;
 		}
 
-		public void Jump()
-		{
-
-		}
-
 		#endregion Public Method
 	}
 }
