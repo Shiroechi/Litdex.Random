@@ -60,7 +60,7 @@ namespace Litdex.Random.PRNG
 		{
 			var oldState = this._State;
 			
-			this._State = (oldState * _Multiplier) + (this._Increment | 1);
+			this._State = (oldState * _Multiplier) + (this._Increment);
 			
 			var rot = (int)(oldState >> 61);
 			return (uint)(oldState ^ (oldState >> 22)) >> (22 + rot);
@@ -74,6 +74,27 @@ namespace Litdex.Random.PRNG
 		public override string AlgorithmName()
 		{
 			return "PCG XSH-RS 32-bit";
+		}
+
+		/// <inheritdoc/>
+		public override void Reseed()
+		{
+			using (var random = RandomNumberGenerator.Create())
+			{
+#if NETSTANDARD2_0
+				var data = new byte[16];
+				random.GetNonZeroBytes(data);
+				this.SetSeed(
+					Utilities.BinaryConverter.ToUInt64(data, 0),
+					Utilities.BinaryConverter.ToUInt64(data, 8));
+#else
+				Span<byte> data = stackalloc byte[16];
+				random.GetNonZeroBytes(data);
+				this.SetSeed(
+					BinaryPrimitives.ReadUInt64LittleEndian(data),
+					BinaryPrimitives.ReadUInt64LittleEndian(data.Slice(8)));
+#endif
+			}
 		}
 
 		/// <summary>
@@ -111,27 +132,6 @@ namespace Litdex.Random.PRNG
 			}
 
 			this.SetSeed(seed[0], seed[1]);
-		}
-
-		/// <inheritdoc/>
-		public override void Reseed()
-		{
-			using (var random = RandomNumberGenerator.Create())
-			{
-#if NETSTANDARD2_0
-				var data = new byte[16];
-				random.GetNonZeroBytes(data);
-				this.SetSeed(
-					Utilities.BinaryConverter.ToUInt64(data, 0),
-					Utilities.BinaryConverter.ToUInt64(data, 8));
-#else
-				Span<byte> data = stackalloc byte[16];
-				random.GetNonZeroBytes(data);
-				this.SetSeed(
-					BinaryPrimitives.ReadUInt64LittleEndian(data),
-					BinaryPrimitives.ReadUInt64LittleEndian(data.Slice(8)));
-#endif
-			}
 		}
 
 		/// <summary>
