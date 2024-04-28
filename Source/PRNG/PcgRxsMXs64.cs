@@ -4,6 +4,8 @@ using System.Buffers.Binary;
 using System;
 using System.Security.Cryptography;
 
+using Litdex.Utilities;
+
 namespace Litdex.Random.PRNG
 {
 	/// <summary>
@@ -18,17 +20,16 @@ namespace Litdex.Random.PRNG
 	{
 		#region Member
 
-		/// <summary>
-		/// Default multiplier for PCG with 64-bit state
-		/// </summary>
-		protected const ulong _PCG_Multiplier_64 = 6364136223846793005u;
+		protected ulong _State;
+		protected ulong _Increment;
+		protected const ulong _Multiplier = 6364136223846793005u;
 
 		#endregion Member
 
 		#region Constructor & Destructor
 
 		/// <summary>
-		///	Create an instance of <see cref="PcgRxsMXs64"/> object.
+		///	Create an instance of <see cref="PcgRxsMXs32"/> object.
 		/// </summary>
 		/// <param name="seed">
 		///	RNG seed.
@@ -38,7 +39,6 @@ namespace Litdex.Random.PRNG
 		///	</param>
 		public PcgRxsMXs64(ulong seed = 0, ulong increment = 0)
 		{
-			this._State = new ulong[2];
 			this.SetSeed(seed, increment);
 		}
 
@@ -47,7 +47,8 @@ namespace Litdex.Random.PRNG
 		/// </summary>
 		~PcgRxsMXs64()
 		{
-			Array.Clear(this._State, 0, this._State.Length);
+			this._State = 0;
+			this._Increment = 0;
 		}
 
 		#endregion Constructor & Destructor
@@ -57,8 +58,9 @@ namespace Litdex.Random.PRNG
 		/// <inheritdoc/>
 		protected override ulong Next()
 		{
-			var oldState = this._State[0];
-			this._State[0] = (oldState * _PCG_Multiplier_64) + (this._State[1] | 1);
+			var oldState = this._State;
+			this._State = this._State * _Multiplier + this._Increment;
+			
 			ulong word = ((oldState >> ((int)(oldState >> 59) + 5)) ^ oldState) * 12605985483714917081;
 			return (word >> 43) ^ word;
 		}
@@ -88,9 +90,10 @@ namespace Litdex.Random.PRNG
 				var bytes = new byte[16];
 				rng.GetNonZeroBytes(bytes);
 				this.SetSeed(
-					seed: BitConverter.ToUInt64(bytes, 0),
-					increment: BitConverter.ToUInt64(bytes, 8));
+					seed: BinaryConverter.ToUInt64(bytes, 0),
+					increment: BinaryConverter.ToUInt64(bytes, 8));
 #endif
+
 			}
 		}
 
@@ -105,17 +108,21 @@ namespace Litdex.Random.PRNG
 		/// </param>
 		public void SetSeed(ulong seed, ulong increment)
 		{
-			this._State[0] = 0;
-			this._State[1] = increment | 1;
-			this._State[0] = this._State[0] * _PCG_Multiplier_64 + this._State[1];
-			this._State[0] += seed;
-			this._State[0] = this._State[0] * _PCG_Multiplier_64 + this._State[1];
+			this._State = 0;
+			this._Increment = increment << 1 | 1;
+			this._State = this._State * _Multiplier + this._Increment;
+			this._State += seed;
+			this._State = this._State * _Multiplier + this._Increment;
 		}
 
 		/// <inheritdoc/>
-		public override void SetSeed(params ulong[] seed)
+		public void SetSeed(params ulong[] seed)
 		{
-			base.SetSeed(seed);
+			if (seed == null || seed.Length == 0)
+			{
+				throw new ArgumentNullException(nameof(seed), "Seed can't null or empty.");
+			}
+
 			this.SetSeed(seed[0], seed[1]);
 		}
 
