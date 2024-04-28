@@ -61,7 +61,7 @@ namespace Litdex.Random.PRNG
 		protected override uint Next()
 		{
 			var oldState = this._State;
-			this._State = (oldState * _Multiplier) + (this._Increment | 1);
+			this._State = (oldState * _Multiplier) + (this._Increment);
 			var xorshifted = (uint)(((oldState >> 18) ^ oldState) >> 27);
 			var rot = (int)(oldState >> 59);
 			return xorshifted.RotateRight(rot);
@@ -83,13 +83,17 @@ namespace Litdex.Random.PRNG
 			using (var rng = RandomNumberGenerator.Create())
 			{
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-				Span<byte> span = new byte[4];
+				Span<byte> span = stackalloc byte[16];
 				rng.GetNonZeroBytes(span);
-				this.SetSeed(BinaryPrimitives.ReadUInt32LittleEndian(span));
+				this.SetSeed(
+					seed: BinaryPrimitives.ReadUInt64LittleEndian(span), 
+					increment: BinaryPrimitives.ReadUInt64LittleEndian(span.Slice(8)));
 #else
-				var bytes = new byte[4];
+				var bytes = new byte[16];
 				rng.GetNonZeroBytes(bytes);
-				this.SetSeed(BinaryConverter.ToUInt32(bytes, 0));
+				this.SetSeed(
+					seed: BinaryConverter.ToUInt64(bytes, 0),
+					increment: BinaryConverter.ToUInt64(bytes, 8));
 #endif
 			}
 		}
