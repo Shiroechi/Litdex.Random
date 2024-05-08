@@ -39,7 +39,7 @@ Currently [Litdex.Random](https://github.com/Shiroechi/Litdex.Random) support th
 
 All of the algorithm have passing Practrand or Test01 test. But I've never test it individually, the author who is said that their algorithm past Practrand or Test01.
 
-You can check in this website ["PRNG Battle Royale: 47 PRNGs � 9 consoles"](https://rhet.dev/wheel/rng-battle-royale-47-prngs-9-consoles/), the writer have tested some of the algorithm that have been implemented.
+You can check in this website ["PRNG Battle Royale: 47 PRNGs � 9 consoles"]([https://rhet.dev/wheel/rng-battle-royale-47-prngs-9-consoles/](https://web.archive.org/web/20220704174727/https://rhet.dev/wheel/rng-battle-royale-47-prngs-9-consoles/)), the writer have tested some of the algorithm that have been implemented.
 
 # How to use
 
